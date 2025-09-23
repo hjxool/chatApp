@@ -5,6 +5,9 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return const CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(middle: Text('主页')),
+      child: Center(child: Text('Main Page', style: TextStyle(fontSize: 24))),
+    );
   }
 }
