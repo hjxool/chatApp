@@ -1,26 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
 import '../../Utils/rpx.dart';
+import '../widgets/BadgeIcon.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
   int _currentIndex = 0;
   // 对应页面
   final List<Widget> _pages = [
     Placeholder(color: Colors.red),
-    Placeholder(color: Colors.white),
     Placeholder(color: Colors.green),
+    Placeholder(color: Colors.yellow),
   ];
   // 导航栏
   final List<BottomNavigationBarItem> _bottomNavItems = [
-    BottomNavigationBarItem(icon: Icon(Symbols.chat), label: '聊天'),
-    BottomNavigationBarItem(icon: Icon(Symbols.money_bag), label: '记账'),
+    BottomNavigationBarItem(
+      icon: BadgeIcon(icon: Icon(Symbols.forum), badgeCount: 30),
+      label: '聊天',
+    ),
+    BottomNavigationBarItem(
+      icon: BadgeIcon(icon: Icon(Symbols.money_bag), badgeCount: 0),
+      label: '记账',
+    ),
+    BottomNavigationBarItem(
+      icon: BadgeIcon(icon: Icon(Symbols.psychology_alt), badgeCount: 0),
+      label: 'AI',
+    ),
   ];
 
   @override
@@ -54,6 +66,7 @@ class _MainPageState extends State<MainPage> {
         },
         items: _bottomNavItems,
         backgroundColor: Colors.grey[200],
+        selectedItemColor: Color(0xFF07B75B), // 选中项颜色
       ),
     );
   }
