@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
 import '../../Utils/rpx.dart';
 import '../widgets/BadgeIcon.dart';
+import '../../Providers/globalConfig.dart';
+import '../widgets/CusList.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -15,25 +17,29 @@ class _MainPageState extends ConsumerState<MainPage> {
   int _currentIndex = 0;
   // 对应页面
   final List<Widget> _pages = [
-    Placeholder(color: Colors.red),
+    CusList(),
     Placeholder(color: Colors.green),
     Placeholder(color: Colors.yellow),
   ];
   // 导航栏
-  final List<BottomNavigationBarItem> _bottomNavItems = [
-    BottomNavigationBarItem(
-      icon: BadgeIcon(icon: Icon(Symbols.forum), badgeCount: 30),
-      label: '聊天',
-    ),
-    BottomNavigationBarItem(
-      icon: BadgeIcon(icon: Icon(Symbols.money_bag), badgeCount: 0),
-      label: '记账',
-    ),
-    BottomNavigationBarItem(
-      icon: BadgeIcon(icon: Icon(Symbols.psychology_alt), badgeCount: 0),
-      label: 'AI',
-    ),
-  ];
+  // 因为只能在build内定义或使用因此要用函数
+  List<BottomNavigationBarItem> _bottomNavItems() {
+    final unreadNum = ref.watch(unreadMessageNum);
+    return [
+      BottomNavigationBarItem(
+        icon: BadgeIcon(icon: Icon(Symbols.forum), badgeCount: unreadNum),
+        label: '聊天',
+      ),
+      BottomNavigationBarItem(
+        icon: BadgeIcon(icon: Icon(Symbols.money_bag), badgeCount: 0),
+        label: '记账',
+      ),
+      BottomNavigationBarItem(
+        icon: BadgeIcon(icon: Icon(Symbols.psychology_alt), badgeCount: 0),
+        label: 'AI',
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +70,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             _currentIndex = value;
           });
         },
-        items: _bottomNavItems,
+        items: _bottomNavItems(),
         backgroundColor: Colors.grey[200],
         selectedItemColor: Color(0xFF07B75B), // 选中项颜色
       ),
