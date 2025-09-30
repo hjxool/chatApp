@@ -16,11 +16,19 @@ class MainPage extends ConsumerStatefulWidget {
 class _MainPageState extends ConsumerState<MainPage> {
   int _currentIndex = 0;
   // 对应页面
-  final List<Widget> _pages = [
-    CusList(),
-    Placeholder(color: Colors.green),
-    Placeholder(color: Colors.yellow),
-  ];
+  Widget _pages(int index) {
+    switch (index) {
+      case 0:
+        return CusList(listData: List.generate(20, (index) => 'Item $index'));
+      case 1:
+        return Placeholder(color: Colors.yellow);
+      case 2:
+        return Placeholder(color: Colors.blue);
+      default:
+        return Text('页面不存在');
+    }
+  }
+
   // 导航栏
   // 因为只能在build内定义或使用因此要用函数
   List<BottomNavigationBarItem> _bottomNavItems() {
@@ -62,7 +70,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         ),
         backgroundColor: Colors.grey[200],
       ),
-      body: _pages[_currentIndex],
+      body: _pages(_currentIndex),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (value) {
