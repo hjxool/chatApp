@@ -1,3 +1,6 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../ViewModels/UnreadNotifier.dart';
 
-final unreadMessageNum = StateProvider<int>((ref) => 13);
+final UnreadMessageProvider = NotifierProvider<UnreadMessage, int>(
+  UnreadMessage.new,
+);

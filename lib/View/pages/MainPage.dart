@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
 import '../../Utils/rpx.dart';
-import '../widgets/BadgeIcon.dart';
+import '../../Utils/BadgeIcon.dart';
 import '../../Providers/globalConfig.dart';
-import '../widgets/CusList.dart';
+import 'ChatPage.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -15,16 +15,25 @@ class MainPage extends ConsumerStatefulWidget {
 
 class _MainPageState extends ConsumerState<MainPage> {
   int _currentIndex = 0;
+
   // 对应页面
-  final List<Widget> _pages = [
-    CusList(),
-    Placeholder(color: Colors.green),
-    Placeholder(color: Colors.yellow),
-  ];
+  Widget _pages(int index) {
+    switch (index) {
+      case 0:
+        return ChatPage();
+      case 1:
+        return Placeholder(color: Colors.yellow);
+      case 2:
+        return Placeholder(color: Colors.blue);
+      default:
+        return Text('页面不存在');
+    }
+  }
+
   // 导航栏
   // 因为只能在build内定义或使用因此要用函数
   List<BottomNavigationBarItem> _bottomNavItems() {
-    final unreadNum = ref.watch(unreadMessageNum);
+    final unreadNum = ref.watch(UnreadMessageProvider);
     return [
       BottomNavigationBarItem(
         icon: BadgeIcon(icon: Icon(Symbols.forum), badgeCount: unreadNum),
@@ -62,7 +71,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         ),
         backgroundColor: Colors.grey[200],
       ),
-      body: _pages[_currentIndex],
+      body: _pages(_currentIndex),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (value) {

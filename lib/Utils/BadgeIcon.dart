@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../Utils/rpx.dart';
+import 'rpx.dart';
 
 class BadgeIcon extends StatelessWidget {
   final int badgeCount;
