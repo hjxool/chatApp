@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../Utils/CusList.dart';
 import '../../Utils/SwiperItem.dart';
 import '../widgets/ChatCard.dart';
 import '../../Utils/rpx.dart';
+import '../../ViewModels/SwiperNotifier.dart';
 
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // 当前页管理Swiper组件的数据源
+    final swiperProvider = NotifierProvider<SwiperNotifier, SwiperState>(
+      SwiperNotifier.new,
+    );
     // 测试数据
-    List<ItemType> listData = List.generate(3, (index) {
+    List<ItemType> listData = List.generate(5, (index) {
       return ItemType(
         content: SwiperItem(
           content: ChatCard(title: 'Item $index'),
@@ -20,6 +26,8 @@ class ChatPage extends StatelessWidget {
             SwiperButton(color: Colors.orange, label: '免打扰', tapFn: () {}),
           ],
           rightWidth: 360.rpx,
+          provider: swiperProvider,
+          itemIndex: index,
         ),
         key: ValueKey('Item $index'),
       );
@@ -33,29 +41,29 @@ class ChatPage extends StatelessWidget {
           addItemFn = addFn;
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // 调用添加函数
-          addItemFn(
-            ItemType(
-              content: SwiperItem(
-                content: ChatCard(title: 'Item ${listData.length}'),
-              ),
-              key: ValueKey('Item ${listData.length}'),
-            ),
-          );
-          listData.add(
-            ItemType(
-              content: SwiperItem(
-                content: ChatCard(title: 'Item ${listData.length}'),
-              ),
-              key: ValueKey('Item ${listData.length}'),
-            ),
-          ); // 保证内外数据同步 避免重新build时丢失数据
-        },
-        backgroundColor: Color(0xFF07B75B),
-        child: Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // 调用添加函数
+      //     addItemFn(
+      //       ItemType(
+      //         content: SwiperItem(
+      //           content: ChatCard(title: 'Item ${listData.length}'),
+      //         ),
+      //         key: ValueKey('Item ${listData.length}'),
+      //       ),
+      //     );
+      //     listData.add(
+      //       ItemType(
+      //         content: SwiperItem(
+      //           content: ChatCard(title: 'Item ${listData.length}'),
+      //         ),
+      //         key: ValueKey('Item ${listData.length}'),
+      //       ),
+      //     ); // 保证内外数据同步 避免重新build时丢失数据
+      //   },
+      //   backgroundColor: Color(0xFF07B75B),
+      //   child: Icon(Icons.add),
+      // ),
     );
   }
 }

@@ -35,12 +35,14 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
   late AnimationController _controller; // 动画控制器
   late Animation<double> _animation; // 动画进度 映射的真实位移值
   int? topButtonIndex; // 展示在最上层的按钮索引
+  // 保存监听引用 在应用热重启时清理残余订阅 防止riverpod订阅出现异常
+  ProviderSubscription<SwiperState>? _providerSubscribe;
 
   @override
   void initState() {
     super.initState();
 
-    triggerWidth = (widget.rightWidth ?? 0) / 2;
+    triggerWidth = (widget.rightWidth ?? 0) / 4;
 
     if (triggerWidth > 0) {
       // 传入右侧宽度才可以滑动
@@ -61,8 +63,28 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 在这设置监听更安全 能保证 context 已经稳定
+    _providerSubscribe?.close(); // 如果存在订阅先清除 防止重复订阅
+    if (widget.provider != null) {
+      // 添加openIndex监听
+      _providerSubscribe = ref.listenManual<SwiperState>(widget.provider!, (
+        pre,
+        now,
+      ) {
+        if (now.openIndex != widget.itemIndex) {
+          // 不是自身 则折叠
+          foldAnimation(0);
+        }
+      });
+    }
+  }
+
+  @override
   void dispose() {
-    _controller.dispose(); // 释放动画资源å
+    _controller.dispose(); // 释放动画资源
+    _providerSubscribe?.close(); // 取消监听
     super.dispose();
   }
 
@@ -83,9 +105,9 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
       if (d.primaryVelocity != null) {
         // primaryVelocity 表示 手指松开时的水平速度 以此实现甩动折叠/展开的手感
         // 负值表示向左 正值表示向右 数值越大说明速度越快
-        if (d.primaryVelocity! < -500) {
+        if (d.primaryVelocity! < -200) {
           shouldOpen = true;
-        } else if (d.primaryVelocity! > 500) {
+        } else if (d.primaryVelocity! > 200) {
           shouldOpen = false;
         } else {
           shouldOpen = _dx < -triggerWidth;
@@ -123,18 +145,24 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
 
   @override
   Widget build(BuildContext context) {
-    SwiperState? state;
-    if (widget.provider != null) {
-      state = ref.watch(widget.provider!);
-      // 点了其他swiper组件 只判断折叠
-      if (state!.openIndex != widget.itemIndex) {
-        foldAnimation(0);
-      }
-    }
+    // 注意！不要在build里 直 接 调用会触发重建的逻辑 不然会无限循环
+    // 这里因为调用了foldAnimation 而内部调用了setState导致无限循环 一进到build就触发setState 然后再次build
+    // SwiperState? state;
+    // if (widget.provider != null) {
+    //   state = ref.watch(widget.provider!);
+    //   if (state!.openIndex != widget.itemIndex) {
+    //     foldAnimation(0);
+    //   }
+    // }
 
     return GestureDetector(
       onHorizontalDragUpdate: _dragUpdate,
       onHorizontalDragEnd: _dragEnd,
+      onHorizontalDragStart: (_) {
+        if (widget.provider != null && widget.itemIndex != null) {
+          ref.read(widget.provider!.notifier).open(widget.itemIndex!);
+        }
+      },
       child: Stack(
         // 使用层叠在一起 滑动露出的方式
         children: [
@@ -150,21 +178,7 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
               child: _buttonsLayer(),
             ),
           // 内容主体 _dx 控制的就是这块的滑动
-          (state != null && widget.itemIndex != null)
-              // 如果当前组件是在列表中使用 则添加点击事件监听
-              ? GestureDetector(
-                  onTapDown: (_) => ref
-                      .read(widget.provider!.notifier)
-                      .open(widget.itemIndex!),
-                  child: Transform.translate(
-                    offset: Offset(_dx, 0),
-                    child: widget.content,
-                  ),
-                )
-              : Transform.translate(
-                  offset: Offset(_dx, 0),
-                  child: widget.content,
-                ),
+          Transform.translate(offset: Offset(_dx, 0), child: widget.content),
         ],
       ),
     );
@@ -172,57 +186,56 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
 
   // 按钮布局
   Widget _buttonsLayer() {
-    final double buttonWidth = widget.rightWidth! / widget.rightButtons!.length;
-
-    // 按钮从层叠逐步错开 设置展开进度
-    final double progress = (_dx.abs() / (widget.rightWidth ?? 1)).clamp(0, 1);
-
     return Container(
       alignment: Alignment.centerRight,
       width: widget.rightWidth, // 父容器设置了top:0, bottom:0 因此不需要再设置高度 自组件会继承父容器高度
-      child: Stack(
-        children: [
-          // for 后没有{} 相当于简写return
-          for (int i = 0; i < widget.rightButtons!.length; i++)
-            topButtonIndex == null
-                ? Positioned(
-                    right: i * buttonWidth * progress,
-                    top: 0,
-                    bottom: 0,
-                    width: buttonWidth,
-                    child: widget.rightButtons![i],
-                  )
-                : AnimatedPositioned(
-                    duration: const Duration(milliseconds: 300),
-                    // 根据进度手动控制边距 从右往左排列
-                    right: topButtonIndex == null
-                        ? i * buttonWidth * progress
-                        : (topButtonIndex == i ? 0 : widget.rightWidth),
-                    // flutter 中父容器高度会继承给子容器 但不会隔代继承
-                    // Container 继承了外层 Positioned top: 0 bottom: 0的约束(高度)
-                    // Stack 因为其父容器 Container 具有宽高 所以等同于父容器大小
-                    // 而子 Positioned 就没有继承了 需要手动设置 top: 0 bottom: 0才能撑满 Stack
-                    top: 0,
-                    bottom: 0,
-                    width: topButtonIndex == null
-                        ? buttonWidth
-                        : (topButtonIndex == i ? widget.rightWidth : 0),
-                    child: AnimatedScale(
-                      duration: const Duration(milliseconds: 300),
-                      scale: topButtonIndex == null
-                          ? 0.85 + 0.15 * progress
-                          : 1.0,
-                      child: Opacity(
-                        opacity: topButtonIndex == null || topButtonIndex == i
-                            ? 1.0
-                            : 0.0,
-                        child: widget.rightButtons![i],
-                      ),
-                    ),
-                  ),
-        ],
-      ),
+      child: Stack(children: buttonScale()),
     );
+  }
+
+  // 按钮点击放大效果
+  List<Widget> buttonScale() {
+    final double buttonWidth = widget.rightWidth! / widget.rightButtons!.length;
+    // 按钮从层叠逐步错开 设置展开进度
+    final double progress = (_dx.abs() / (widget.rightWidth ?? 1)).clamp(0, 1);
+
+    List<Widget> buttons = [];
+    if (topButtonIndex == null) {
+      // 没有点击按钮 用普通按钮 避免动画重叠干扰
+      for (int i = 0; i < widget.rightButtons!.length; i++) {
+        buttons.add(
+          Positioned(
+            right: i * buttonWidth * progress,
+            // flutter 中父容器高度会继承给子容器 但不会隔代继承
+            // Container 继承了外层 Positioned top: 0 bottom: 0的约束(高度)
+            // Stack 因为其父容器 Container 具有宽高 所以等同于父容器大小
+            // 而子 Positioned 就没有继承了 需要手动设置 top: 0 bottom: 0才能撑满 Stack
+            top: 0,
+            bottom: 0,
+            width: buttonWidth,
+            child: widget.rightButtons![i],
+          ),
+        );
+      }
+    } else {
+      // 一旦已经展开 替换成带动画的按钮
+      if (widget.provider != null) {
+        SwiperState state = ref.watch(widget.provider!);
+      } else {}
+      for (int i = 0; i < widget.rightButtons!.length; i++) {
+        buttons.add(
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            right: i * buttonWidth * progress,
+            top: 0,
+            bottom: 0,
+            width: buttonWidth,
+            child: widget.rightButtons![i],
+          ),
+        );
+      }
+    }
+    return buttons;
   }
 }
 

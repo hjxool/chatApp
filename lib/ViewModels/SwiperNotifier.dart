@@ -17,7 +17,7 @@ class SwiperNotifier extends Notifier<SwiperState> {
   @override
   SwiperState build() => const SwiperState();
 
-  // 点击某行卡片
+  // 展开某行卡片
   void open(int index) {
     // 因为state是一个对象 为了触发重建需要整个替换对象引用
     state = state.copyWith(openIndex: index);
