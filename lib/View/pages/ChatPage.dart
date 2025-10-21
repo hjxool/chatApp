@@ -21,9 +21,21 @@ class ChatPage extends StatelessWidget {
         content: SwiperItem(
           content: ChatCard(title: 'Item $index'),
           rightButtons: [
-            SwiperButton(color: Colors.red, label: '删除', tapFn: () {}),
-            SwiperButton(color: Colors.blue, label: '置顶', tapFn: () {}),
-            SwiperButton(color: Colors.orange, label: '免打扰', tapFn: () {}),
+            SwiperButton(
+              color: Colors.red,
+              label: '删除',
+              tapFn: () => print('触发删除'),
+            ),
+            SwiperButton(
+              color: Colors.blue,
+              label: '置顶',
+              tapFn: () => print('触发置顶'),
+            ),
+            SwiperButton(
+              color: Colors.orange,
+              label: '免打扰',
+              tapFn: () => print('触发免打扰'),
+            ),
           ],
           rightWidth: 360.rpx,
           provider: swiperProvider,
