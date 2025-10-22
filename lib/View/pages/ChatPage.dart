@@ -25,6 +25,7 @@ class ChatPage extends StatelessWidget {
               color: Colors.red,
               label: '删除',
               tapFn: () => print('触发删除'),
+              remark: '删除并清空记录',
             ),
             SwiperButton(
               color: Colors.blue,
@@ -35,6 +36,7 @@ class ChatPage extends StatelessWidget {
               color: Colors.orange,
               label: '免打扰',
               tapFn: () => print('触发免打扰'),
+              remark: '消息免打扰',
             ),
           ],
           rightWidth: 360.rpx,
@@ -47,35 +49,30 @@ class ChatPage extends StatelessWidget {
     late void Function(ItemType value) addItemFn;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('ChatWithMe'),
+        actions: [
+          IconButton(
+            onPressed: null,
+            icon: Icon(Icons.add, color: Colors.black),
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(2.rpx),
+          child: Divider(
+            height: 2.rpx,
+            thickness: 2.rpx,
+            color: Color(0xFFE5E5E5), // 微信风格发丝线,
+          ),
+        ),
+        backgroundColor: Colors.grey[200],
+      ),
       body: CusList(
         listData: listData,
         onReady: ({required void Function(ItemType value) addFn}) {
           addItemFn = addFn;
         },
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     // 调用添加函数
-      //     addItemFn(
-      //       ItemType(
-      //         content: SwiperItem(
-      //           content: ChatCard(title: 'Item ${listData.length}'),
-      //         ),
-      //         key: ValueKey('Item ${listData.length}'),
-      //       ),
-      //     );
-      //     listData.add(
-      //       ItemType(
-      //         content: SwiperItem(
-      //           content: ChatCard(title: 'Item ${listData.length}'),
-      //         ),
-      //         key: ValueKey('Item ${listData.length}'),
-      //       ),
-      //     ); // 保证内外数据同步 避免重新build时丢失数据
-      //   },
-      //   backgroundColor: Color(0xFF07B75B),
-      //   child: Icon(Icons.add),
-      // ),
     );
   }
 }

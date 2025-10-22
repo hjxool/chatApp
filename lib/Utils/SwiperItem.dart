@@ -317,8 +317,8 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
       color: btn.color,
       child: InkWell(
         onTap: () {
-          if (index != null) {
-            // 点击放大
+          if (index != null && btn.remark != null) {
+            // 传入索引 且 有需要展开显示的备注 点击放大
             setState(() {
               topButtonIndex = index;
             });
@@ -343,9 +343,12 @@ class SwiperButton {
   final Color color;
   final String label;
   final VoidCallback tapFn;
+  final String? remark;
+
   const SwiperButton({
     required this.color,
     required this.label,
     required this.tapFn,
+    this.remark,
   });
 }

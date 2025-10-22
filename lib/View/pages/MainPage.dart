@@ -53,24 +53,6 @@ class _MainPageState extends ConsumerState<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ChatWithMe'),
-        actions: [
-          IconButton(
-            onPressed: null,
-            icon: const Icon(Icons.add, color: Colors.black),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1.rpx),
-          child: Divider(
-            height: 1.rpx,
-            thickness: 1.rpx,
-            color: Color(0xFFE5E5E5), // 微信风格发丝线,
-          ),
-        ),
-        backgroundColor: Colors.grey[200],
-      ),
       body: _pages(_currentIndex),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
