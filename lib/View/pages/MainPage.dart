@@ -40,8 +40,8 @@ class _MainPageState extends ConsumerState<MainPage> {
         label: '聊天',
       ),
       BottomNavigationBarItem(
-        icon: BadgeIcon(icon: Icon(Symbols.money_bag), badgeCount: 0),
-        label: '记账',
+        icon: BadgeIcon(icon: Icon(Symbols.person_book), badgeCount: 0),
+        label: '通讯录',
       ),
       BottomNavigationBarItem(
         icon: BadgeIcon(icon: Icon(Symbols.psychology_alt), badgeCount: 0),

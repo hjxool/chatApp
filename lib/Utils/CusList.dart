@@ -7,12 +7,16 @@ class ItemType {
   const ItemType({required this.content, required this.key});
 }
 
-typedef OnReadyCallback =
-    void Function({required void Function(ItemType value) addFn});
+class OnReadyCallback {
+  void Function(ItemType) addFn;
+  void Function(Key) removeFn;
+
+  OnReadyCallback({required this.addFn, required this.removeFn});
+}
 
 class CusList extends StatefulWidget {
   final List<ItemType> listData;
-  final OnReadyCallback? onReady; // 列表初始化完成回调
+  final void Function(OnReadyCallback)? onReady; // 列表初始化完成回调
 
   const CusList({super.key, required this.listData, this.onReady});
 
@@ -30,7 +34,7 @@ class _CusListState extends State<CusList> {
     super.initState();
     _initList();
     widget.onReady?.call(
-      addFn: _addItems,
+      OnReadyCallback(addFn: _addItems, removeFn: _removeItem),
     ); // dart中调用函数本质上都是.call() 为了了防止空指针 加了?
   }
 
@@ -53,7 +57,9 @@ class _CusListState extends State<CusList> {
   }
 
   // 移除列表项及动画
-  void _removeItem(int index) {
+  void _removeItem(Key key) {
+    final index = _items.indexWhere((e) => e.key == key);
+    if (index == -1) return;
     final removeItem = _items.removeAt(index);
     // 删除时不会调用 itemBuilder 必须自己提供
     // removeItem 最好放到删除后 因为 builder 需要一个“被删除的 item”来渲染动画 因此要保存下删除项

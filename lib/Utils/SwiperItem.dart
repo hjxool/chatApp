@@ -259,7 +259,7 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
         for (int i = 0; i < widget.rightButtons!.length; i++) {
           buttons.add(
             _buildBtnByIndex(
-              _buttonClick(widget.rightButtons![i]),
+              _buttonClick(widget.rightButtons![i], index: i),
               right: topButtonIndex == i ? 0 : widget.rightWidth!,
               width: topButtonIndex == i ? widget.rightWidth! : buttonWidth,
             ),
@@ -270,7 +270,7 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
         for (int i = 0; i < widget.rightButtons!.length; i++) {
           buttons.add(
             _buildBtnByIndex(
-              _buttonClick(widget.rightButtons![i]),
+              _buttonClick(widget.rightButtons![i], index: i),
               right: topButtonIndex == i ? 0 : -buttonWidth,
               width: topButtonIndex == i ? widget.rightWidth! : buttonWidth,
             ),
@@ -281,7 +281,7 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
         for (int i = 0; i < widget.rightButtons!.length; i++) {
           buttons.add(
             _buildBtnByIndex(
-              _buttonClick(widget.rightButtons![i]),
+              _buttonClick(widget.rightButtons![i], index: i),
               right: i < topButtonIndex!
                   ? -buttonWidth
                   : (topButtonIndex == i ? 0 : widget.rightWidth!),
@@ -311,14 +311,14 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
   }
 
   // 点击按钮 区分是放大的默认事件 还是放大后触发传入事件
-  Widget _buttonClick(SwiperButton btn, {int? index}) {
+  Widget _buttonClick(SwiperButton btn, {required int index}) {
     return Material(
       // 继承了父容器的宽高
       color: btn.color,
       child: InkWell(
         onTap: () {
-          if (index != null && btn.remark != null) {
-            // 传入索引 且 有需要展开显示的备注 点击放大
+          if (topButtonIndex == null && btn.remark != null) {
+            // 初选按钮 且 有需要展开显示的备注 点击放大
             setState(() {
               topButtonIndex = index;
             });
@@ -329,8 +329,11 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
         },
         child: Center(
           child: Text(
-            btn.label,
+            topButtonIndex == index && btn.remark != null
+                ? btn.remark!
+                : btn.label,
             style: TextStyle(color: Colors.white, fontSize: 24.rpx),
+            softWrap: false, // 防止文字换行
           ),
         ),
       ),
