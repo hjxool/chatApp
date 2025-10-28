@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../Utils/CusList.dart';
-import '../../Utils/SwiperItem.dart';
-import '../widgets/ChatCard.dart';
-import '../../Utils/rpx.dart';
-import '../../ViewModels/SwiperNotifier.dart';
-import '../widgets/ShowMenuShape.dart';
+import 'package:chat_app/Utils/CusList.dart';
+import 'package:chat_app/Utils/SwiperItem.dart';
+import 'package:chat_app/View/widgets/ChatCard.dart';
+import 'package:chat_app/Utils/rpx.dart';
+import 'package:chat_app/ViewModels/SwiperNotifier.dart';
+import 'package:chat_app/View/widgets/ShowMenuShape.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -118,36 +118,6 @@ class _ChatPageState extends State<ChatPage> {
             },
             icon: Icon(Icons.add, color: Colors.black),
           ),
-          // PopupMenuButton<String>(
-          //   icon: Icon(Icons.add, color: Colors.black),
-          //   onSelected: (value) {
-          //     print("选择了 $value");
-          //   },
-          //   offset: Offset(0, 100.rpx),
-          //   color: Color.fromRGBO(76, 76, 76, 1),
-          //   itemBuilder: (_) => [
-          //     PopupMenuItem(
-          //       value: 'add',
-          //       child: Row(
-          //         children: [
-          //           Icon(Icons.person_add, color: Colors.white),
-          //           SizedBox(width: 10.rpx),
-          //           Text('添加朋友', style: TextStyle(color: Colors.white)),
-          //         ],
-          //       ),
-          //     ),
-          //     PopupMenuItem(
-          //       value: 'scan',
-          //       child: Row(
-          //         children: [
-          //           Icon(Icons.qr_code_scanner, color: Colors.white),
-          //           SizedBox(width: 10.rpx),
-          //           Text('扫一扫', style: TextStyle(color: Colors.white)),
-          //         ],
-          //       ),
-          //     ),
-          //   ],
-          // ),
         ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(2.rpx),

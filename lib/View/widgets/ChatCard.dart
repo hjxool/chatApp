@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../Utils/rpx.dart';
+import 'package:chat_app/Utils/rpx.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
+import 'package:chat_app/Utils/ImgLoad.dart';
 
 class ChatCard extends StatelessWidget {
   final String title;
@@ -19,11 +20,18 @@ class ChatCard extends StatelessWidget {
         // leading: CircleAvatar(child: Icon(Icons.person)),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(16.rpx),
-          child: Image.network(
-            'https://ts1.tc.mm.bing.net/th/id/OIP-C.Q5v9A7pG3XIaTHTrRCUbSQHaEo?w=291&h=204&c=8&rs=1&qlt=90&o=6&cb=12&dpr=2&pid=3.1&rm=2',
+          // child: Image.network(
+          //   'https://ts1.tc.mm.bing.net/th/id/OIP-C.Q5v9A7pG3XIaTHTrRCUbSQHaEo?w=291&h=204&c=8&rs=1&qlt=90&o=6&cb=12&dpr=2&pid=3.1&rm=2',
+          //   width: 120.rpx,
+          //   height: 120.rpx,
+          //   fit: BoxFit.cover,
+          // ),
+          child: SizedBox(
             width: 120.rpx,
             height: 120.rpx,
-            fit: BoxFit.cover,
+            child: ImgLoad(
+              'https://ts1.tc.mm.bing.net/th/id/OIP-C.Q5v9A7pG3XIaTHTrRCUbSQHaEo?w=291&h=204&c=8&rs=1&qlt=90&o=6&cb=12&dpr=2&pid=3.1&rm=2',
+            ),
           ),
         ),
         title: Text(title, style: TextStyle(fontSize: 32.rpx)),
