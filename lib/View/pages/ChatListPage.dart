@@ -1,11 +1,12 @@
+import 'package:chat_app/Utils/CusAppBar.dart';
+import 'package:chat_app/Utils/CusShowMenu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chat_app/Utils/CusList.dart';
 import 'package:chat_app/Utils/SwiperItem.dart';
 import 'package:chat_app/View/widgets/ChatCard.dart';
-import 'package:chat_app/Utils/rpx.dart';
+import 'package:chat_app/Utils/CommonApi.dart';
 import 'package:chat_app/ViewModels/SwiperNotifier.dart';
-import 'package:chat_app/View/widgets/ShowMenuShape.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -65,33 +66,16 @@ class _ChatPageState extends State<ChatPage> {
     final GlobalKey btnKey = GlobalKey(); // 用于获取导航栏按钮尺寸定位
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ChatWithMe'),
+      appBar: CusAppBar(
+        title: 'ChatWithMe',
         actions: [
           IconButton(
             key: btnKey,
             onPressed: () {
-              // 获取按钮节点对象
-              final RenderBox btnObj =
-                  btnKey.currentContext!.findRenderObject() as RenderBox;
-              // 获得相对于屏幕左上角的坐标
-              // 注：不传ancestor参数 默认相对于整个屏幕左上角 ancestor表示参考节点
-              final Offset offset = btnObj.localToGlobal(Offset.zero);
-              // 弹出菜单
-              showMenu(
+              CusShowMenu(
+                buttonKey: btnKey,
                 context: context,
-                // Menu相对于屏幕的边距
-                position: RelativeRect.fromLTRB(
-                  // offset是按钮左上角坐标 但是showMenu会自动计算 避免超出屏幕 所以实际效果是贴着屏幕边缘
-                  (offset.dx * 2).rpx, // left 距离屏幕左边缘位置
-                  // top 位置在按钮下方 所以要加上按钮高度
-                  ((offset.dy + btnObj.size.height) * 2).rpx,
-                  0, // right 距离屏幕右边缘位置 只要确定了前两个值后两个可以忽略
-                  0, // bottom 一旦top确定 bottom会被忽略
-                ),
-                color: Color(0xFF545454),
-                menuPadding: EdgeInsets.all(0), // 去除默认内边距
-                shape: ShowMenuShape(triangleOffset: 20.rpx),
+                menuPosition: MenuPosition.bottom,
                 items: [
                   PopupMenuItem(
                     value: 'add',
@@ -114,20 +98,11 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ],
-              );
+              ).popMenu();
             },
             icon: Icon(Icons.add, color: Colors.black),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(2.rpx),
-          child: Divider(
-            height: 2.rpx,
-            thickness: 2.rpx,
-            color: Color(0xFFE5E5E5), // 微信风格发丝线,
-          ),
-        ),
-        backgroundColor: Colors.grey[200],
       ),
       body: CusList(
         listData: listData,

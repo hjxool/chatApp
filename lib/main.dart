@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'View/pages/MainPage.dart';
-import 'Utils/rpx.dart';
+import 'Utils/CommonApi.dart';
+import 'View/pages/ChatLogPage.dart';
 
 void main() {
   // runApp内部会自动调用一次 但是如果要在runApp之前使用Flutter绑定的功能 需要手动调用（如初始化插件、调用平台通道、获取屏幕信息）
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey),
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.grey[200],
           elevation: 0, // 去掉阴影
           centerTitle: true,
           titleTextStyle: TextStyle(
@@ -39,7 +40,32 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: SafeArea(child: const MainPage()),
+      initialRoute: '/', // 指定了initialRoute后home会失效
+      routes: {
+        '/': (_) => const MainPage(),
+        '/chat_log': (_) => const ChatLogPage(),
+      },
+      // 自定义路由跳转动画
+      // onGenerateRoute: (settings) {
+      //   WidgetBuilder builder;
+      //   switch (settings.name) {
+      //     case '/chat_log':
+      //       builder = (_) => const ChatLogPage(title: '测试');
+      //       break;
+      //     default:
+      //       builder = (_) => const MainPage();
+      //   }
+      //   return PageRouteBuilder(
+      //     pageBuilder: (context, _, _) => builder(context),
+      //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      //       final p = Tween(
+      //         begin: Offset(1, 0),
+      //         end: Offset(0, 0),
+      //       ).chain(CurveTween(curve: Curves.ease));
+      //       return SlideTransition(position: animation.drive(p), child: child);
+      //     },
+      //   );
+      // },
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:chat_app/Utils/rpx.dart';
+import 'package:chat_app/Utils/CommonApi.dart';
 import 'package:chat_app/ViewModels/SwiperNotifier.dart';
 
 class SwiperItem extends ConsumerStatefulWidget {
@@ -40,10 +40,9 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
   bool topButtonIndexToNull = false; // 是否从放大按钮还原回普通按钮
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     triggerWidth = (widget.rightWidth ?? 0) / 4;
-
     if (triggerWidth > 0) {
       // 传入右侧宽度才可以滑动
       _controller = AnimationController(
@@ -60,7 +59,6 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
           });
         });
     }
-
     // 在这设置监听更安全 能保证 context 已经稳定
     _providerSubscribe?.close(); // 如果存在订阅先清除 防止重复订阅
     if (widget.provider != null) {
@@ -141,26 +139,13 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
 
   @override
   Widget build(BuildContext context) {
-    // 注意！不要在build里 直 接 调用会触发重建的逻辑 不然会无限循环
-    // 这里因为调用了_foldAnimation 而内部调用了setState导致无限循环 一进到build就触发setState 然后再次build
-    // SwiperState? state;
-    // if (widget.provider != null) {
-    //   state = ref.watch(widget.provider!);
-    //   if (state!.openIndex != widget.itemIndex) {
-    //     _foldAnimation(0);
-    //   }
-    // }
-
     return GestureDetector(
       onHorizontalDragUpdate: _dragUpdate,
       onHorizontalDragEnd: _dragEnd,
       onHorizontalDragStart: (_) {
-        // 同一行 手动折叠 触发按钮还原动画
-        // 如果只判断topButtonIndex != null 会因为当前行因为其他行打开而折叠 但是topButtonIndex不为null 导致无法还原按钮展开动画
-        final curIndex = ref.watch(widget.provider!).openIndex;
+        // 已展开 且 有按钮放大 触发按钮还原动画
         topButtonIndexToNull =
-            (widget.itemIndex == curIndex) && (topButtonIndex != null);
-
+            (_dx.abs() == widget.rightWidth) && (topButtonIndex != null);
         if (widget.provider != null && widget.itemIndex != null) {
           // 打开对应行
           ref.read(widget.provider!.notifier).open(widget.itemIndex!);
@@ -185,7 +170,45 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
               child: _buttonsLayer(),
             ),
           // 内容主体 _dx 控制的就是这块的滑动
-          Transform.translate(offset: Offset(_dx, 0), child: widget.content),
+          Transform.translate(
+            offset: Offset(_dx, 0),
+            child: Stack(
+              children: [
+                widget.content,
+                // 只要开始展开就添加遮罩
+                if (_dx != 0)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      onTap: () {
+                        // 点击内容主体时折叠
+                        if (_dx.abs() == widget.rightWidth) {
+                          // 点击的是展开行 进行折叠
+                          _foldAnimation(0);
+                          // 顺便重置标志位
+                          topButtonIndex = null;
+                          topButtonIndexToNull = false;
+                        }
+                      },
+                      child: Container(
+                        color: Colors.white.withValues(
+                          // 渐变透明度
+                          alpha:
+                              (_dx.abs() / (widget.rightWidth ?? 1)).clamp(
+                                0,
+                                1,
+                              ) *
+                              0.6,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );

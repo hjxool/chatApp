@@ -30,19 +30,19 @@ class _CusListState extends State<CusList> {
   final List<ItemType> _items = []; // 用于展示动画的拷贝列表
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _initList();
     widget.onReady?.call(
       OnReadyCallback(addFn: _addItems, removeFn: _removeItem),
-    ); // dart中调用函数本质上都是.call() 为了了防止空指针 加了?
+    );
   }
 
   // 初始化列表
   void _initList() async {
     for (int i = 0; i < widget.listData.length; i++) {
       // 添加暂停 使得每一项错落插入
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 200));
       _addItems(widget.listData[i]);
     }
   }

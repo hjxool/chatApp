@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
 import 'package:chat_app/Utils/BadgeIcon.dart';
 import 'package:chat_app/Providers/globalConfig.dart';
-import 'ChatPage.dart';
+import 'ChatListPage.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});

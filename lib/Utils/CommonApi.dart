@@ -51,7 +51,15 @@ class ScreenSize {
   }
 }
 
+// 给数字类型添加拓展属性
 extension CusRpx on num {
   // this 调用者
   double get rpx => this * ScreenSize.scaleWidth;
+}
+
+// 路由传参语法糖
+extension RouteArgs on BuildContext {
+  T? arguments<T>() {
+    return ModalRoute.of(this)?.settings.arguments as T;
+  }
 }
