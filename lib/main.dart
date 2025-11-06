@@ -1,3 +1,4 @@
+import 'package:chat_app/View/pages/ChatDetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,32 +43,36 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/', // 指定了initialRoute后home会失效
-      routes: {
-        '/': (_) => const MainPage(),
-        '/chat_log': (_) => const ChatLogPage(),
-      },
-      // 自定义路由跳转动画
-      // onGenerateRoute: (settings) {
-      //   WidgetBuilder builder;
-      //   switch (settings.name) {
-      //     case '/chat_log':
-      //       builder = (_) => const ChatLogPage(title: '测试');
-      //       break;
-      //     default:
-      //       builder = (_) => const MainPage();
-      //   }
-      //   return PageRouteBuilder(
-      //     pageBuilder: (context, _, _) => builder(context),
-      //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      //       final p = Tween(
-      //         begin: Offset(1, 0),
-      //         end: Offset(0, 0),
-      //       ).chain(CurveTween(curve: Curves.ease));
-      //       return SlideTransition(position: animation.drive(p), child: child);
-      //     },
-      //   );
+      // initialRoute: '/', // 指定了initialRoute后home会失效
+      // routes: {
+      //   '/': (_) => const MainPage(),
+      //   '/chat_log': (_) => const ChatLogPage(),
       // },
+      // 自定义路由跳转动画
+      onGenerateRoute: (settings) {
+        WidgetBuilder builder;
+        switch (settings.name) {
+          case '/chat_log':
+            builder = (_) => const ChatLogPage();
+            break;
+          case '/chat_detail':
+            builder = (_) => const ChatDetailPage();
+            break;
+          default:
+            builder = (_) => const MainPage();
+        }
+        return PageRouteBuilder(
+          pageBuilder: (context, _, _) => builder(context),
+          settings: settings, // 加这个才能通过arguments传参数
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final p = Tween(
+              begin: Offset(1, 0),
+              end: Offset(0, 0),
+            ).chain(CurveTween(curve: Curves.ease));
+            return SlideTransition(position: animation.drive(p), child: child);
+          },
+        );
+      },
     );
   }
 }
