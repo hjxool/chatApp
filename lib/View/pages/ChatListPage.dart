@@ -72,10 +72,9 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             key: btnKey,
             onPressed: () {
-              CusShowMenu(
+              CusShowMenu.popMenu(
                 buttonKey: btnKey,
                 context: context,
-                menuPosition: MenuPosition.bottom,
                 items: [
                   PopupMenuItem(
                     value: 'add',
@@ -98,7 +97,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ],
-              ).popMenu();
+              );
             },
             icon: Icon(Icons.add, color: Colors.black),
           ),

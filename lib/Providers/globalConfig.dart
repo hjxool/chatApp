@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:chat_app/ViewModels/UnreadNotifier.dart';
+import 'package:chat_app/ViewModels/GlobalNotifier.dart';
 
 final UnreadMessageProvider = NotifierProvider<UnreadMessage, int>(
   UnreadMessage.new,
+);
+
+final UserInfoProvider = NotifierProvider<UserInfoNotifier, UserInfoState>(
+  UserInfoNotifier.new,
 );

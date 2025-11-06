@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'View/pages/MainPage.dart';
 import 'Utils/CommonApi.dart';
 import 'View/pages/ChatLogPage.dart';
 
-void main() {
+void main() async {
   // runApp内部会自动调用一次 但是如果要在runApp之前使用Flutter绑定的功能 需要手动调用（如初始化插件、调用平台通道、获取屏幕信息）
   // WidgetsFlutterBinding.ensureInitialized();
   // ScreenSize.init();
+  await initializeDateFormatting('zh_CN', null); // intl库初始化
   runApp(const ProviderScope(child: MyApp()));
 }
 

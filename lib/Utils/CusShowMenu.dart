@@ -5,21 +5,15 @@ import 'package:flutter/material.dart';
 enum MenuPosition { top, bottom }
 
 class CusShowMenu {
-  final GlobalKey buttonKey;
-  final BuildContext context;
-  final MenuPosition menuPosition;
-  final Color color;
-  final List<PopupMenuItem> items;
+  const CusShowMenu();
 
-  const CusShowMenu({
-    required this.buttonKey,
-    required this.context,
-    required this.menuPosition,
-    this.color = const Color(0xFF545454),
-    required this.items,
-  });
-
-  void popMenu() {
+  static void popMenu({
+    required GlobalKey buttonKey,
+    required BuildContext context,
+    MenuPosition menuPosition = MenuPosition.bottom,
+    Color color = const Color(0xFF545454),
+    required List<PopupMenuItem> items,
+  }) {
     // 获取按钮节点对象
     final RenderBox btn =
         buttonKey.currentContext!.findRenderObject() as RenderBox;
@@ -30,7 +24,7 @@ class CusShowMenu {
     showMenu(
       context: context,
       // Menu相对于屏幕的边距
-      position: _getPosition(offset, btn),
+      position: _getPosition(offset, btn, menuPosition),
       color: color,
       menuPadding: EdgeInsets.all(0), // 去除默认内边距
       shape: MenuShape(triangleOffset: 20.rpx, menuPosition: menuPosition),
@@ -38,7 +32,11 @@ class CusShowMenu {
     );
   }
 
-  RelativeRect _getPosition(Offset offset, RenderBox btn) {
+  static RelativeRect _getPosition(
+    Offset offset,
+    RenderBox btn,
+    MenuPosition menuPosition,
+  ) {
     switch (menuPosition) {
       case MenuPosition.bottom:
         return RelativeRect.fromLTRB(

@@ -47,7 +47,7 @@ class ScreenSize {
     height = (size.height * 100).round() / 100;
     scaleWidth = (width / designWidth * 100).round() / 100;
 
-    print('屏幕尺寸: width=$width, height=$height, scaleWidth=$scaleWidth');
+    // print('屏幕尺寸: width=$width, height=$height, scaleWidth=$scaleWidth');
   }
 }
 
