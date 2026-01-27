@@ -27,10 +27,11 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     // 测试数据
-    List<ItemType> listData = List.generate(5, (index) {
-      return ItemType(
+    List<ItemType> listData = List.generate(
+      5,
+      (index) => ItemType(
         content: SwiperItem(
-          content: ChatCard(title: 'Item $index'),
+          content: ChatCard(title: 'Item $index', userId: '222'),
           rightButtons: [
             SwiperButton(
               color: Colors.red,
@@ -60,8 +61,8 @@ class _ChatPageState extends State<ChatPage> {
           itemIndex: index,
         ),
         key: ValueKey('Item $index'),
-      );
-    });
+      ),
+    );
 
     final GlobalKey btnKey = GlobalKey(); // 用于获取导航栏按钮尺寸定位
 

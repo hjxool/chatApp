@@ -5,6 +5,7 @@ final UnreadMessageProvider = NotifierProvider<UnreadMessage, int>(
   UnreadMessage.new,
 );
 
-final UserInfoProvider = NotifierProvider<UserInfoNotifier, UserInfoState>(
-  UserInfoNotifier.new,
-);
+final UserConfigProvider =
+    AsyncNotifierProvider<UserConfigNotifier, UserConfigState>(
+      UserConfigNotifier.new,
+    );

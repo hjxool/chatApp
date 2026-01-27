@@ -5,13 +5,18 @@ import 'package:chat_app/Utils/ImgLoad.dart';
 
 class ChatCard extends StatelessWidget {
   final String title;
-  const ChatCard({super.key, required this.title});
+  final String userId;
+  const ChatCard({super.key, required this.title, required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/chat_log', arguments: {'title': title});
+        Navigator.pushNamed(
+          context,
+          '/chat_log',
+          arguments: {'title': title, 'userId': userId},
+        );
       },
       child: Container(
         decoration: BoxDecoration(

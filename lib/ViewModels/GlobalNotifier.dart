@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:chat_app/DataModels/API/UserApi.dart';
+import 'package:chat_app/DataModels/models/User.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // 未读消息
@@ -8,18 +11,44 @@ class UnreadMessage extends Notifier<int> {
   void increment() => state++;
 }
 
-// 用户信息
-class UserInfoState {
+// 账号级配置同步
+class UserConfigState {
   final String? userId;
+  final List<User>? userInfos;
 
-  const UserInfoState({this.userId});
+  const UserConfigState({this.userId, this.userInfos});
 }
 
-class UserInfoNotifier extends Notifier<UserInfoState> {
+// 使用AsyncNotifier 返回值就不再是单纯的UserConfigState 而是AsyncValue<T>
+class UserConfigNotifier extends AsyncNotifier<UserConfigState> {
   @override
-  UserInfoState build() => const UserInfoState(userId: '1');
+  // FutureOr 表示支持同步异步两种方式
+  Future<UserConfigState> build() async {
+    final List<User> users = await UserApi.fetchUser();
+    print('users:$users');
+    return UserConfigState(userId: '1', userInfos: users);
+  }
 
-  void setValue({String? userId}) {
-    state = UserInfoState(userId: userId ?? state.userId);
+  void setValue({String? userId, List<User>? userInfos}) {
+    // 因为state类型变为AsyncValue<T> 因此用AsyncValue.data包裹
+    final data = state.value; // 并且取值变成.value
+    if (data == null) return;
+    state = AsyncData(
+      UserConfigState(
+        userId: userId ?? data.userId,
+        userInfos: userInfos ?? data.userInfos,
+      ),
+    );
+  }
+
+  void setUserInfo(String userId, {bool? noDisturb}) {
+    final newList = state.value?.userInfos?.map((e) {
+      if (e.userId == userId) {
+        return e.copyWith(noDisturb: noDisturb);
+      }
+      return e;
+    }).toList();
+    // provider本质是对比引用地址来判断是否变化触发监听 因此必须要更新整个state
+    setValue(userInfos: newList);
   }
 }
