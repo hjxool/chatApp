@@ -46,6 +46,8 @@ class _ChatLogPageState extends State<ChatLogPage> {
       Message(text: "明天见", time: DateTime(2025, 10, 31, 10, 0), userId: '222'),
     ];
 
+    // double bottom = MediaQuery.of(context).viewInsets.bottom;
+
     return GestureDetector(
       onTap: () {
         // 让当前任何获得焦点的控件失焦
@@ -168,5 +170,22 @@ class _ChatLogPageState extends State<ChatLogPage> {
         ),
       ),
     );
+  }
+
+  // 根据软键盘是否展开以及面板是否显示 综合判断输入框部分动画延迟
+  int aniDuration(double bottom) {
+    if (showExtra) {
+      // 面板展开
+      if (bottom > 0) {
+        // 软键盘展开
+        return 0;
+      }
+    } else {
+      // 面板隐藏
+      if (bottom > 0) {
+        return 0;
+      }
+    }
+    return 300;
   }
 }
