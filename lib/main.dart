@@ -1,11 +1,11 @@
-import 'package:chat_app/View/pages/ChatDetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'View/pages/MainPage.dart';
-import 'Utils/CommonApi.dart';
-import 'View/pages/ChatLogPage.dart';
+import 'view/pages/main_page.dart';
+import 'utils/common_api.dart';
+import 'view/pages/chat_log_page.dart';
+import 'view/pages/chat_detail_page.dart';
 
 void main() async {
   // runApp内部会自动调用一次 但是如果要在runApp之前使用Flutter绑定的功能 需要手动调用（如初始化插件、调用平台通道、获取屏幕信息）

@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:chat_app/Utils/CommonApi.dart';
-import 'package:chat_app/ViewModels/SwiperNotifier.dart';
+import 'package:chat_app/utils/common_api.dart';
+import 'package:chat_app/view_models/swiper_notifier.dart';
 
 class SwiperItem extends ConsumerStatefulWidget {
   final Widget content;

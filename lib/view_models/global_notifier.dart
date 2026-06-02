@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:chat_app/DataModels/API/UserApi.dart';
-import 'package:chat_app/DataModels/models/User.dart';
+import 'package:chat_app/data_models/api/user_api.dart';
+import 'package:chat_app/data_models/models/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // 未读消息

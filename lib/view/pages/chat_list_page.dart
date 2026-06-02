@@ -1,12 +1,12 @@
-import 'package:chat_app/Utils/CusAppBar.dart';
-import 'package:chat_app/Utils/CusShowMenu.dart';
+import 'package:chat_app/utils/cus_app_bar.dart';
+import 'package:chat_app/utils/cus_show_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:chat_app/Utils/CusList.dart';
-import 'package:chat_app/Utils/SwiperItem.dart';
-import 'package:chat_app/View/widgets/ChatCard.dart';
-import 'package:chat_app/Utils/CommonApi.dart';
-import 'package:chat_app/ViewModels/SwiperNotifier.dart';
+import 'package:chat_app/utils/cus_list.dart';
+import 'package:chat_app/utils/swiper_item.dart';
+import 'package:chat_app/view/widgets/chat_card.dart';
+import 'package:chat_app/utils/common_api.dart';
+import 'package:chat_app/view_models/swiper_notifier.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});

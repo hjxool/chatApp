@@ -1,5 +1,5 @@
-import 'package:chat_app/Providers/globalConfig.dart';
-import 'package:chat_app/Utils/CommonApi.dart';
+import 'package:chat_app/providers/global_config.dart';
+import 'package:chat_app/utils/common_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';

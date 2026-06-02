@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/Utils/CommonApi.dart';
+import 'package:chat_app/utils/common_api.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
-import 'package:chat_app/Utils/ImgLoad.dart';
+import 'package:chat_app/utils/img_load.dart';
 
 class ChatCard extends StatelessWidget {
   final String title;

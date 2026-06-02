@@ -1,6 +1,6 @@
 // 放请求接口 通常是封装 http 调用
-import 'package:chat_app/DataModels/Net/DioClient.dart';
-import '../models/User.dart';
+import 'package:chat_app/data_models/net/dio_client.dart';
+import '../models/user.dart';
 
 class UserApi {
   UserApi._(); // 构造函数私有化 防止创建实例

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
-import 'package:chat_app/Utils/BadgeIcon.dart';
-import 'package:chat_app/Providers/globalConfig.dart';
-import 'ChatListPage.dart';
+import 'package:chat_app/utils/badge_icon.dart';
+import 'package:chat_app/providers/global_config.dart';
+import 'chat_list_page.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});

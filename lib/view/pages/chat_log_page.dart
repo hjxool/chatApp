@@ -1,6 +1,6 @@
-import 'package:chat_app/Utils/CommonApi.dart';
-import 'package:chat_app/Utils/CusAppBar.dart';
-import 'package:chat_app/View/widgets/ChatBubble.dart';
+import 'package:chat_app/utils/common_api.dart';
+import 'package:chat_app/utils/cus_app_bar.dart';
+import 'package:chat_app/view/widgets/chat_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

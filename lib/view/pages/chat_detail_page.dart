@@ -1,7 +1,7 @@
-import 'package:chat_app/DataModels/models/User.dart';
-import 'package:chat_app/Providers/globalConfig.dart';
-import 'package:chat_app/Utils/CommonApi.dart';
-import 'package:chat_app/Utils/CusAppBar.dart';
+import 'package:chat_app/data_models/models/user.dart';
+import 'package:chat_app/providers/global_config.dart';
+import 'package:chat_app/utils/common_api.dart';
+import 'package:chat_app/utils/cus_app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
