@@ -33,6 +33,7 @@ class _CusListState extends State<CusList> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _initList();
+    // 为了使用?.空安全 所以显式调用call 本质上fn.call()和fn()是一样的 但前者可以在fn为null时不调用而不报错
     widget.onReady?.call(
       OnReadyCallback(addFn: _addItems, removeFn: _removeItem),
     );

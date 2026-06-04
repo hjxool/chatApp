@@ -1,4 +1,4 @@
-import 'package:chat_app/utils/common_api.dart';
+import 'package:chat_app/components/common_api.dart';
 import 'package:flutter/material.dart';
 
 class ImgLoad extends StatelessWidget {

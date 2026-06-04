@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'package:chat_app/data_models/api/user_api.dart';
-import 'package:chat_app/data_models/models/user.dart';
+import 'package:chat_app/api/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // 未读消息
@@ -10,6 +9,10 @@ class UnreadMessage extends Notifier<int> {
 
   void increment() => state++;
 }
+
+final UnreadMessageProvider = NotifierProvider<UnreadMessage, int>(
+  UnreadMessage.new,
+);
 
 // 账号级配置同步
 class UserConfigState {
@@ -52,3 +55,8 @@ class UserConfigNotifier extends AsyncNotifier<UserConfigState> {
     setValue(userInfos: newList);
   }
 }
+
+final UserConfigProvider =
+    AsyncNotifierProvider<UserConfigNotifier, UserConfigState>(
+      UserConfigNotifier.new,
+    );

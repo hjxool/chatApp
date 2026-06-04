@@ -1,5 +1,5 @@
-import 'package:chat_app/providers/global_config.dart';
-import 'package:chat_app/utils/common_api.dart';
+import 'package:chat_app/providers/global_notifier.dart';
+import 'package:chat_app/components/common_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +25,7 @@ class ChatBubble extends ConsumerWidget {
       itemBuilder: (BuildContext context, int index) {
         final msg = list[index];
         final showDate =
-            index == 0 || !isSameDay(msg.time, list[index - 1].time);
+            index == 0 || !isSameTime(msg.time, list[index - 1].time);
 
         return Column(
           children: [
@@ -38,8 +38,10 @@ class ChatBubble extends ConsumerWidget {
   }
 
   // 判断是否为同一天 则合并日期显示
-  bool isSameDay(DateTime d1, DateTime d2) {
-    return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
+  bool isSameTime(DateTime current, DateTime previous) {
+    // 使用 difference 计算时间差 inMinutes 返回相差的整分钟数
+    // 使用 abs() 防止时间顺序错乱导致的负数问题
+    return current.difference(previous).inMinutes.abs() < 5;
   }
 
   // 日期样式

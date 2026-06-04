@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/utils/common_api.dart';
+import 'package:chat_app/components/common_api.dart';
 
 class BadgeIcon extends StatelessWidget {
   final int badgeCount;
