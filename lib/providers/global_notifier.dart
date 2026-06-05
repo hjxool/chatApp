@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:chat_app/api/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:chat_app/components/common_api.dart';
 
 // 未读消息
 class UnreadMessage extends Notifier<int> {
@@ -28,7 +29,7 @@ class UserConfigNotifier extends AsyncNotifier<UserConfigState> {
   // FutureOr 表示支持同步异步两种方式
   Future<UserConfigState> build() async {
     final List<User> users = await UserApi.fetchUser();
-    print('users:$users');
+    consoleLog('users:$users', tag: '用户');
     return UserConfigState(userId: '1', userInfos: users);
   }
 

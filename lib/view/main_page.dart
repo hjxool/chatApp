@@ -51,6 +51,8 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.read(UserConfigProvider.future); // 预加载用户配置
+
     return Scaffold(
       body: _pages(_currentIndex),
       bottomNavigationBar: BottomNavigationBar(

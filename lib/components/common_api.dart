@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'dart:developer' as developer;
 
 // 全局版本
 // class ScreenSize with WidgetsBindingObserver {
@@ -61,5 +62,14 @@ extension CusRpx on num {
 extension RouteArgs on BuildContext {
   T? arguments<T>() {
     return ModalRoute.of(this)?.settings.arguments as T;
+  }
+}
+
+// 全局日志函数
+void consoleLog(String message, {String? tag, Object? obj}) {
+  if (tag == null) {
+    developer.log(message, error: obj);
+  } else {
+    developer.log(message, name: tag, error: obj);
   }
 }

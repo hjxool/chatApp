@@ -7,6 +7,7 @@ import 'package:chat_app/components/swiper_item.dart';
 import 'package:chat_app/components/chat_card.dart';
 import 'package:chat_app/components/common_api.dart';
 import 'package:chat_app/providers/swiper_notifier.dart';
+import 'dart:developer' as developer;
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -47,12 +48,12 @@ class _ChatPageState extends State<ChatPage> {
             SwiperButton(
               color: Colors.blue,
               label: '置顶',
-              tapFn: () => print('触发置顶'),
+              tapFn: () => developer.log('触发置顶', name: 'SwiperButton'),
             ),
             SwiperButton(
               color: Colors.orange,
               label: '免打扰',
-              tapFn: () => print('触发免打扰'),
+              tapFn: () => developer.log('触发免打扰', name: 'SwiperButton'),
               remark: '消息免打扰',
             ),
           ],

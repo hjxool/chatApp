@@ -10,7 +10,7 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       userId: json['userId'] as String, // 因为是dynamic 这里加as是保证类型安全
-      noDisturb: json['noDisturb'] as bool?, // bool? 表示可为空
+      noDisturb: json['noDisturb'] == true, // 有些接口可能返回1/0或者null 这里做兼容处理
     );
   }
   Map<String, dynamic> toJson() => {
@@ -35,9 +35,11 @@ class UserApi {
       // 测试数据
       return List.generate(
         3,
-        (index) => User(userId: '$index$index$index', noDisturb: false),
+        (index) => {'userId': '$index$index$index', 'noDisturb': false},
       );
     });
-    return (data as List).map((e) => User.fromJson(e)).toList();
+    return (data as List<Map<String, dynamic>>)
+        .map((e) => User.fromJson(e))
+        .toList();
   }
 }

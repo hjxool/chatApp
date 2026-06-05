@@ -3,6 +3,7 @@ import 'package:chat_app/components/cus_app_bar.dart';
 import 'package:chat_app/components/chat_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'dart:developer' as developer;
 
 class ChatLogPage extends StatefulWidget {
   const ChatLogPage({super.key});
@@ -125,7 +126,10 @@ class _ChatLogPageState extends State<ChatLogPage> {
                             onSubmitted: (value) {
                               // 发送后触发 onSubmitted的默认行为会清除输入框焦点自动收齐软键盘
                               if (value.trim().isNotEmpty) {
-                                print("发送消息: $value");
+                                developer.log(
+                                  "发送消息: $value",
+                                  name: 'ChatLogPage',
+                                );
                                 _inputController.clear(); // 发送后清除输入内容
                               }
                             },

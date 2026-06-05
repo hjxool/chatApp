@@ -19,21 +19,29 @@ class ChatBubble extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListView.builder(
-      physics: BouncingScrollPhysics(),
-      itemCount: list.length,
-      itemBuilder: (BuildContext context, int index) {
-        final msg = list[index];
-        final showDate =
-            index == 0 || !isSameTime(msg.time, list[index - 1].time);
+    final asyncConfig = ref.watch(UserConfigProvider);
 
-        return Column(
-          children: [
-            if (showDate) dateStyle(msg.time),
-            messageStyle(msg, ref, index),
-          ],
+    return asyncConfig.when(
+      data: (data) {
+        return ListView.builder(
+          physics: BouncingScrollPhysics(),
+          itemCount: list.length,
+          itemBuilder: (BuildContext context, int index) {
+            final msg = list[index];
+            final showDate =
+                index == 0 || !isSameTime(msg.time, list[index - 1].time);
+
+            return Column(
+              children: [
+                if (showDate) dateStyle(msg.time),
+                messageStyle(msg, data.userId ?? '', index),
+              ],
+            );
+          },
         );
       },
+      error: (err, stack) => Text('加载失败: $err'),
+      loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -61,20 +69,19 @@ class ChatBubble extends ConsumerWidget {
   }
 
   // 消息气泡
-  Widget messageStyle(Message msg, WidgetRef ref, int index) {
-    final state = ref.watch(UserConfigProvider).value;
+  Widget messageStyle(Message msg, String userId, int index) {
     // 外层用Column 这里用Align区分贴边
     return Align(
       // 区分贴边位置
-      alignment: state?.userId == msg.userId
+      alignment: userId == msg.userId
           ? Alignment.centerRight
           : Alignment.centerLeft,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 6.rpx, horizontal: 40.rpx),
         child: CustomPaint(
           painter: BubblePainter(
-            isMe: state?.userId == msg.userId,
-            color: state?.userId == msg.userId
+            isMe: userId == msg.userId,
+            color: userId == msg.userId
                 ? Color.fromRGBO(102, 196, 102, 1)
                 : Color.fromRGBO(233, 233, 235, 1),
             showTail: showTail(list, index),
@@ -84,9 +91,7 @@ class ChatBubble extends ConsumerWidget {
             child: Text(
               msg.text,
               style: TextStyle(
-                color: state?.userId == msg.userId
-                    ? Colors.white
-                    : Colors.black87,
+                color: userId == msg.userId ? Colors.white : Colors.black87,
                 fontSize: 32.rpx,
               ),
             ),

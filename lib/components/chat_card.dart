@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:chat_app/components/common_api.dart';
 import 'package:material_symbols_icons/symbols.dart'; // 第三方图标非内置
 import 'package:chat_app/components/img_load.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ChatCard extends StatelessWidget {
+class ChatCard extends ConsumerWidget {
   final String title;
   final String userId;
   const ChatCard({super.key, required this.title, required this.userId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(

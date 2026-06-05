@@ -5,6 +5,7 @@ import 'package:chat_app/components/cus_app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:developer' as developer;
 
 class ChatDetailPage extends ConsumerWidget {
   const ChatDetailPage({super.key});
@@ -15,7 +16,10 @@ class ChatDetailPage extends ConsumerWidget {
     // select 监听特定属性变化
     final curUser = ref.watch(
       UserConfigProvider.select((state) {
-        print('state.value.userInfos:${state.value?.userInfos}');
+        developer.log(
+          '${state.value?.userInfos}',
+          name: 'state.value.userInfos',
+        );
         return state.value?.userInfos?.firstWhere(
           (e) => e.userId == args?['userId'],
           orElse: () => User(userId: '', noDisturb: true),
