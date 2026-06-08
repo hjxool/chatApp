@@ -5,7 +5,6 @@ import 'package:chat_app/components/cus_app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:developer' as developer;
 
 class ChatDetailPage extends ConsumerWidget {
   const ChatDetailPage({super.key});
@@ -16,13 +15,10 @@ class ChatDetailPage extends ConsumerWidget {
     // select 监听特定属性变化
     final curUser = ref.watch(
       UserConfigProvider.select((state) {
-        developer.log(
-          '${state.value?.userInfos}',
-          name: 'state.value.userInfos',
-        );
+        consoleLog('用户详情', obj: state.value?.userInfos);
         return state.value?.userInfos?.firstWhere(
           (e) => e.userId == args?['userId'],
-          orElse: () => User(userId: '', noDisturb: true),
+          orElse: () => User(userId: '', noDisturb: true, isTop: true),
         );
       }),
     );
@@ -43,13 +39,36 @@ class ChatDetailPage extends ConsumerWidget {
                   ),
                   rowStyle(
                     '消息免打扰',
-                    onOff: switchStyle(curUser?.noDisturb ?? false, (value) {
-                      ref
-                          .read(UserConfigProvider.notifier)
-                          .setUserInfo(args?['userId'] ?? '', noDisturb: value);
-                    }),
+                    onOff: CupertinoSwitch(
+                      value: curUser?.noDisturb ?? false,
+                      onChanged: (value) {
+                        ref
+                            .read(UserConfigProvider.notifier)
+                            .setUserInfo(
+                              args?['userId'] ?? '',
+                              noDisturb: value,
+                            );
+                      },
+                    ),
                   ),
-                  rowStyle('置顶聊天'),
+                  rowStyle(
+                    '置顶聊天',
+                    newline: true,
+                    onOff: CupertinoSwitch(
+                      value: curUser?.isTop ?? false,
+                      onChanged: (value) {
+                        ref
+                            .read(UserConfigProvider.notifier)
+                            .setUserInfo(args?['userId'] ?? '', isTop: value);
+                      },
+                    ),
+                  ),
+                  rowStyle(
+                    '设置当前聊天背景',
+                    newline: true,
+                    icon: Icons.arrow_forward_ios,
+                  ),
+                  rowStyle('清空聊天记录', newline: false),
                 ],
               ),
               error: (err, _) => Center(child: Text('加载失败: $err')),
@@ -67,34 +86,34 @@ class ChatDetailPage extends ConsumerWidget {
     bool newline = false,
     Widget? onOff,
   }) {
-    return Container(
-      height: 120.rpx,
-      padding: EdgeInsets.symmetric(horizontal: 20.rpx),
-      margin: newline ? EdgeInsets.only(bottom: 12.rpx) : null,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: newline
-            ? null
-            : BoxBorder.fromLTRB(
-                bottom: BorderSide(color: Color(0xFFE5E5E5), width: 2.rpx),
-              ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(color: Colors.black87, fontSize: 32.rpx),
-          ),
-          if (icon != null) Icon(icon, size: 32.rpx, color: Colors.grey[400]),
-          if (onOff != null) onOff,
-        ],
+    return GestureDetector(
+      onTap: () {
+        consoleLog('点击了$rowStyle', tag: '详情页点击');
+      },
+      child: Container(
+        height: 120.rpx,
+        padding: EdgeInsets.symmetric(horizontal: 20.rpx),
+        margin: newline ? EdgeInsets.only(bottom: 12.rpx) : null,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: newline
+              ? null
+              : BoxBorder.fromLTRB(
+                  bottom: BorderSide(color: Color(0xFFE5E5E5), width: 2.rpx),
+                ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: TextStyle(color: Colors.black87, fontSize: 32.rpx),
+            ),
+            if (icon != null) Icon(icon, size: 32.rpx, color: Colors.grey[400]),
+            if (onOff != null) onOff,
+          ],
+        ),
       ),
     );
-  }
-
-  // 开关统一样式
-  Widget switchStyle(bool value, void Function(bool) onChanged) {
-    return CupertinoSwitch(value: value, onChanged: onChanged);
   }
 }
