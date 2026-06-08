@@ -70,6 +70,8 @@ class ChatBubble extends ConsumerWidget {
 
   // 消息气泡
   Widget messageStyle(Message msg, String userId, int index) {
+    final double margin = 100.rpx; // 消息气泡与屏幕边缘的最小距离
+
     // 外层用Column 这里用Align区分贴边
     return Align(
       // 区分贴边位置
@@ -77,7 +79,10 @@ class ChatBubble extends ConsumerWidget {
           ? Alignment.centerRight
           : Alignment.centerLeft,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 6.rpx, horizontal: 40.rpx),
+        // 根据发送者调整外边距
+        padding: userId == msg.userId
+            ? EdgeInsets.fromLTRB(margin, 6.rpx, 40.rpx, 6.rpx)
+            : EdgeInsets.fromLTRB(40.rpx, 6.rpx, margin, 6.rpx),
         child: CustomPaint(
           painter: BubblePainter(
             isMe: userId == msg.userId,

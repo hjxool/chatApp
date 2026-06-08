@@ -28,7 +28,8 @@ class _ChatLogPageState extends State<ChatLogPage> {
       Message(text: "你好呀", time: DateTime(2025, 10, 30, 9, 30), userId: '1'),
       Message(text: "早上好", time: DateTime(2025, 10, 30, 9, 32), userId: '222'),
       Message(
-        text: "今天下午有空吗？",
+        text:
+            "今天下午有空吗？asmdoiajsiodjasiojdasjdioasjdiojwihidsuniuanbsduiasnduiansdiunasdnasnuduiasndui",
         time: DateTime(2025, 10, 30, 14, 10),
         userId: '222',
       ),

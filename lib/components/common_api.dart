@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'dart:developer' as developer;
+import 'package:intl/intl.dart';
 
 // 全局版本
 // class ScreenSize with WidgetsBindingObserver {
@@ -68,8 +69,40 @@ extension RouteArgs on BuildContext {
 // 全局日志函数
 void consoleLog(String message, {String? tag, Object? obj}) {
   if (tag == null) {
-    developer.log(message, error: obj);
+    developer.log(message, error: _toJson(obj));
   } else {
-    developer.log(message, name: tag, error: obj);
+    developer.log(message, name: tag, error: _toJson(obj));
+  }
+}
+
+dynamic _toJson(dynamic obj) {
+  switch (obj) {
+    case Map():
+      // 这里返回的已经是Map类型 不需要调用toList
+      return obj.map((key, value) => MapEntry(key.toString(), _toJson(value)));
+    case Iterable():
+      // Iterable内定义的mao和Map内定义的map不是同一个函数 因此这里要调用toList
+      return obj.map((e) => _toJson(e)).toList();
+    case num():
+    case String():
+    case bool():
+      return obj;
+    case DateTime():
+      return DateFormat('yyyy-MM-dd HH:mm:ss').format(obj);
+    default:
+      if (_hasToJson(obj)) {
+        // 这样野生对象实现toJson就不用管内部嵌套的对象 只要外层字段齐全就行
+        return _toJson(obj.toJson());
+      } else {
+        return obj.toString();
+      }
+  }
+}
+
+bool _hasToJson(dynamic obj) {
+  try {
+    return obj?.toJson != null;
+  } catch (e) {
+    return false;
   }
 }

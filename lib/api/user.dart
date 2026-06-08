@@ -4,22 +4,26 @@ import 'package:chat_app/api/dio_client.dart';
 class User {
   final String userId;
   final bool? noDisturb;
+  final bool? isTop;
 
-  const User({required this.userId, this.noDisturb});
+  const User({required this.userId, this.noDisturb, this.isTop});
   // 通常带有 fromJson / toJson
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       userId: json['userId'] as String, // 因为是dynamic 这里加as是保证类型安全
       noDisturb: json['noDisturb'] == true, // 有些接口可能返回1/0或者null 这里做兼容处理
+      isTop: json['isTop'] == true,
     );
   }
   Map<String, dynamic> toJson() => {
     'userId': userId, // dart中因为不存在全局变量 因此在不产生命名冲突时 可以省略this
     'noDisturb': noDisturb,
+    'isTop': isTop,
   };
-  User copyWith({String? userId, bool? noDisturb}) => User(
+  User copyWith({String? userId, bool? noDisturb, bool? isTop}) => User(
     userId: userId ?? this.userId, // 这里跟局部变量有命名冲突 所以加this
     noDisturb: noDisturb ?? this.noDisturb,
+    isTop: isTop ?? this.isTop,
   );
 }
 
@@ -35,7 +39,11 @@ class UserApi {
       // 测试数据
       return List.generate(
         3,
-        (index) => {'userId': '$index$index$index', 'noDisturb': false},
+        (index) => {
+          'userId': '$index$index$index',
+          'noDisturb': false,
+          'isTop': false,
+        },
       );
     });
     return (data as List<Map<String, dynamic>>)

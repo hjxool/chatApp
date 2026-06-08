@@ -45,10 +45,10 @@ class UserConfigNotifier extends AsyncNotifier<UserConfigState> {
     );
   }
 
-  void setUserInfo(String userId, {bool? noDisturb}) {
+  void setUserInfo(String userId, {bool? noDisturb, bool? isTop}) {
     final newList = state.value?.userInfos?.map((e) {
       if (e.userId == userId) {
-        return e.copyWith(noDisturb: noDisturb);
+        return e.copyWith(noDisturb: noDisturb, isTop: isTop);
       }
       return e;
     }).toList();
