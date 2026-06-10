@@ -106,3 +106,5 @@ bool _hasToJson(dynamic obj) {
     return false;
   }
 }
+
+typedef JsonMap = Map<String, dynamic>;

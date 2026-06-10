@@ -21,7 +21,7 @@ class _ChatLogPageState extends State<ChatLogPage> {
 
   @override
   Widget build(BuildContext context) {
-    final args = context.arguments<Map<String, dynamic>>(); // 接收参数
+    final args = context.arguments<JsonMap>(); // 接收参数
     double bottom = MediaQuery.of(context).viewInsets.bottom;
     // 测试数据
     final messages = [

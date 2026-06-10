@@ -1,4 +1,5 @@
 import 'package:chat_app/api/dio_client.dart';
+import 'package:chat_app/components/common_api.dart';
 
 // 放纯数据模型
 class User {
@@ -8,14 +9,14 @@ class User {
 
   const User({required this.userId, this.noDisturb, this.isTop});
   // 通常带有 fromJson / toJson
-  factory User.fromJson(Map<String, dynamic> json) {
+  factory User.fromJson(JsonMap json) {
     return User(
       userId: json['userId'] as String, // 因为是dynamic 这里加as是保证类型安全
       noDisturb: json['noDisturb'] == true, // 有些接口可能返回1/0或者null 这里做兼容处理
       isTop: json['isTop'] == true,
     );
   }
-  Map<String, dynamic> toJson() => {
+  JsonMap toJson() => {
     'userId': userId, // dart中因为不存在全局变量 因此在不产生命名冲突时 可以省略this
     'noDisturb': noDisturb,
     'isTop': isTop,
@@ -46,8 +47,6 @@ class UserApi {
         },
       );
     });
-    return (data as List<Map<String, dynamic>>)
-        .map((e) => User.fromJson(e))
-        .toList();
+    return (data as List<JsonMap>).map((e) => User.fromJson(e)).toList();
   }
 }
