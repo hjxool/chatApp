@@ -53,15 +53,15 @@ class PopItem {
 void popBottom({required BuildContext context, required List<PopItem> items}) {
   showModalBottomSheet(
     context: context,
-    // 支持圆角裁切 如果不加 自定义的圆角背景会被顶层的直角阴影覆盖
+    // 圆角裁切 如果不加 默认内容元素会覆盖默认弹窗圆角 变成直角
     clipBehavior: Clip.antiAlias,
     // 设置弹窗的外观形状
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(20.0),
-        topRight: Radius.circular(20.0),
-      ),
-    ),
+    // shape: const RoundedRectangleBorder(
+    //   borderRadius: BorderRadius.only(
+    //     topLeft: Radius.circular(20.0),
+    //     topRight: Radius.circular(20.0),
+    //   ),
+    // ),
     builder: (context) {
       return Column(
         mainAxisSize: MainAxisSize.min,
