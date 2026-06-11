@@ -1,5 +1,5 @@
-import 'package:chat_app/components/common_api.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ImgLoad extends StatelessWidget {
   final String url;
@@ -16,15 +16,16 @@ class ImgLoad extends StatelessWidget {
       return Stack(
         fit: StackFit.expand,
         children: [
-          Container(
-            color: Colors.grey[200],
-            alignment: Alignment.center,
-            child: FractionallySizedBox(
-              widthFactor: 0.2,
-              heightFactor: 0.2,
-              child: CircularProgressIndicator(strokeWidth: 4.rpx),
-            ),
-          ),
+          // 加载圆圈
+          // Container(
+          //   color: Colors.grey[200],
+          //   alignment: Alignment.center,
+          //   child: FractionallySizedBox(
+          //     widthFactor: 0.2,
+          //     heightFactor: 0.2,
+          //     child: CircularProgressIndicator(strokeWidth: 4.rpx),
+          //   ),
+          // ),
           Image.network(
             url,
             fit: fit,
@@ -35,6 +36,24 @@ class ImgLoad extends StatelessWidget {
                 opacity: frame == null ? 0 : 1, // frame==null 表示还没渲染出来
                 duration: const Duration(milliseconds: 300),
                 child: child,
+              );
+            },
+            // 加载时的骨架屏
+            loadingBuilder: (context, child, loadingProgress) {
+              // null表示加载完了 返回图片
+              if (loadingProgress == null) return child;
+              return Shimmer.fromColors(
+                baseColor: Colors.grey[300]!, // 骨架屏底色（较深的灰色）
+                highlightColor: Colors.grey[100]!, // 闪烁过去的高亮色（较浅的灰色）
+                // period 默认呼吸一次的周期时间为1500ms
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white, // 必须要有一层不透明的底色 Shimmer 才能附着上去
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               );
             },
           ),
