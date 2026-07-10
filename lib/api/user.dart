@@ -32,8 +32,8 @@ class User {
 class UserApi {
   UserApi._(); // 构造函数私有化 防止创建实例
 
+  // 模板
   static Future<List<User>> fetchUser({String? userId}) async {
-    final dio = DioClient().dio;
     final data = await dio.get('path').then((res) => res.data).catchError((
       err,
     ) {
@@ -48,5 +48,19 @@ class UserApi {
       );
     });
     return (data as List<JsonMap>).map((e) => User.fromJson(e)).toList();
+  }
+
+  // 登录接口
+  static Future<Map<String, dynamic>?> login({
+    required String username,
+    required String password,
+  }) async {
+    final data = await dio
+        .post('/api/login')
+        .then((res) => res.data)
+        .catchError((err) {
+          return false;
+        });
+    return data;
   }
 }
