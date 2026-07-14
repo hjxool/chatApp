@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:chat_app/api/user.dart';
+import 'package:chat_app/models/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chat_app/components/common_api.dart';
+import 'package:chat_app/models/dio_client.dart';
 
 // 未读消息
 class UnreadMessage extends Notifier<int> {
@@ -15,22 +16,20 @@ final UnreadMessageProvider = NotifierProvider<UnreadMessage, int>(
   UnreadMessage.new,
 );
 
-// 账号级配置同步
-class UserConfigState {
-  final String? userId;
-  final List<User>? userInfos;
-
-  const UserConfigState({this.userId, this.userInfos});
-}
-
 // 使用AsyncNotifier 返回值就不再是单纯的UserConfigState 而是AsyncValue<T>
 class UserConfigNotifier extends AsyncNotifier<UserConfigState> {
   @override
   // FutureOr 表示支持同步异步两种方式
   Future<UserConfigState> build() async {
-    final List<User> users = await UserApi.fetchUser();
-    consoleLog('users:$users', tag: '用户');
-    return UserConfigState(userId: '1', userInfos: users);
+    // 监听 authProvider
+    final authAsync = ref.watch(authProvider);
+    // 因为是AsyncNotifier返回的异步state 因此要用.value
+    if (authAsync.value == null) {
+      return const UserConfigState(userId: null, userInfos: []);
+    }
+    consoleLog('检测到 Token，开始获取用户同步配置...', tag: '用户数据');
+    final List<User> userInfos = await UserApi.fetchUserInfos();
+    return UserConfigState(userId: '1', userInfos: userInfos);
   }
 
   void setValue({String? userId, List<User>? userInfos}) {
@@ -61,3 +60,41 @@ final UserConfigProvider =
     AsyncNotifierProvider<UserConfigNotifier, UserConfigState>(
       UserConfigNotifier.new,
     );
+
+class AuthNotifier extends AsyncNotifier<String?> {
+  @override
+  FutureOr<String?> build() {
+    // 自动登录 读取本地持久化缓存（比如 SharedPreferences）
+    // String? savedToken = await SharedPreferences.getInstance().then((sp) => sp.getString('token'));
+    // if (savedToken != null) {
+    //   updateToken(savedToken); // 同步给 dio 拦截器
+    //   return savedToken;
+    // }
+    return null;
+  }
+
+  // 登录业务逻辑
+  Future<void> login(String username, String password) async {
+    state = const AsyncValue.loading();
+    // guard自动把 try-catch 包装起来，并且把结果转换成 AsyncValue 类型
+    state = await AsyncValue.guard(() async {
+      // 调用接口获取 token
+      final token = await UserApi.login(username: username, password: password);
+      // 同步给你的全局 Dio 拦截器
+      if (token != null) updateToken(token);
+      // 此时 state 变为了 AsyncData(token)
+      return token;
+    });
+  }
+
+  // 退出登录
+  void logout() {
+    updateToken(''); // 清空 dio 中的 token
+    state = const AsyncValue.data(null); // 状态回归未登录
+  }
+}
+
+// autoDispose是为了一次性使用销毁 而不用长期占据内存
+final authProvider = AsyncNotifierProvider.autoDispose<AuthNotifier, String?>(
+  AuthNotifier.new,
+);

@@ -1,7 +1,8 @@
-import 'package:chat_app/api/dio_client.dart';
+import 'package:chat_app/models/dio_client.dart';
 import 'package:chat_app/components/common_api.dart';
 
 // 放纯数据模型
+// 单个用户/好友的数据模型
 class User {
   final String userId;
   final bool? noDisturb;
@@ -33,7 +34,7 @@ class UserApi {
   UserApi._(); // 构造函数私有化 防止创建实例
 
   // 模板
-  static Future<List<User>> fetchUser({String? userId}) async {
+  static Future<List<User>> fetchUserInfos({String? userId}) async {
     final data = await dio.get('path').then((res) => res.data).catchError((
       err,
     ) {
@@ -51,16 +52,32 @@ class UserApi {
   }
 
   // 登录接口
-  static Future<Map<String, dynamic>?> login({
+  static Future<String?> login({
     required String username,
     required String password,
   }) async {
     final data = await dio
-        .post('/api/login')
+        .post('/api/login', data: {'username': username, 'password': password})
         .then((res) => res.data)
         .catchError((err) {
           return false;
         });
-    return data;
+    if (data is! bool) {
+      final token = data['token'] as String?;
+      if (token == null || token.isEmpty) {
+        throw Exception('登录失败，未获取到有效Token');
+      }
+      return token;
+    } else {
+      return null;
+    }
   }
+}
+
+// 账号级全局配置状态模型
+class UserConfigState {
+  final String? userId;
+  final List<User>? userInfos;
+
+  const UserConfigState({this.userId, this.userInfos});
 }

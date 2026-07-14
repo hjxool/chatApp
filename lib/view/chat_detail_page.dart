@@ -1,4 +1,4 @@
-import 'package:chat_app/api/user.dart';
+import 'package:chat_app/models/user.dart';
 import 'package:chat_app/providers/global_notifier.dart';
 import 'package:chat_app/components/common_api.dart';
 import 'package:chat_app/components/cus_app_bar.dart';
