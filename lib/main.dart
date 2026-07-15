@@ -1,8 +1,8 @@
+import 'package:chat_app/view/root_auth_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'view/main_page.dart';
 import 'components/common_api.dart';
 import 'view/chat_log_page.dart';
 import 'view/chat_detail_page.dart';
@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
       //   '/': (_) => const MainPage(),
       //   '/chat_log': (_) => const ChatLogPage(),
       // },
+      home: const RootAuthWrapper(), // 将默认主页改为状态包装器
       // 自定义路由跳转动画
       onGenerateRoute: (settings) {
         WidgetBuilder builder;
@@ -59,7 +60,8 @@ class MyApp extends StatelessWidget {
             builder = (_) => const ChatDetailPage();
             break;
           default:
-            builder = (_) => const MainPage();
+            // 路由默认兜底也回到包装器
+            builder = (_) => const RootAuthWrapper();
         }
         return PageRouteBuilder(
           pageBuilder: (context, _, _) => builder(context),
