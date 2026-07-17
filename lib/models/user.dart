@@ -1,4 +1,3 @@
-import 'package:chat_app/main.dart';
 import 'package:chat_app/models/dio_client.dart';
 import 'package:chat_app/components/common_api.dart';
 
@@ -66,7 +65,7 @@ class UserApi {
         });
     if (data == null) return data;
     final token = data['body']['token'] as String?;
-    return token!.isEmpty ? null : token; // 把空字符串的情况也处理成null
+    return (token == null || token.isEmpty) ? null : token; // 把空字符串的情况也处理成null
   }
 }
 
