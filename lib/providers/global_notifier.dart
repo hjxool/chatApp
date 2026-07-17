@@ -74,17 +74,23 @@ class AuthNotifier extends AsyncNotifier<String?> {
   }
 
   // 登录业务逻辑
-  Future<void> login(String username, String password) async {
+  Future<bool> login(String username, String password) async {
     state = const AsyncValue.loading();
+    // 使用一个变量来记录最终结果
+    bool isSuccess = false;
     // guard自动把 try-catch 包装起来，并且把结果转换成 AsyncValue 类型
     state = await AsyncValue.guard(() async {
       // 调用接口获取 token
       final token = await UserApi.login(username: username, password: password);
       // 同步给你的全局 Dio 拦截器
-      if (token != null) updateToken(token);
+      if (token != null) {
+        updateToken(token);
+        isSuccess = true;
+      }
       // 此时 state 变为了 AsyncData(token)
       return token;
     });
+    return isSuccess; // 返回布尔值结果给 UI 层
   }
 
   // 退出登录

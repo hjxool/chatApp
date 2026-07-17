@@ -1,3 +1,4 @@
+import 'package:chat_app/main.dart';
 import 'package:chat_app/models/dio_client.dart';
 import 'package:chat_app/components/common_api.dart';
 
@@ -60,17 +61,12 @@ class UserApi {
         .post('/api/login', data: {'username': username, 'password': password})
         .then((res) => res.data)
         .catchError((err) {
-          return false;
+          consoleLog('登录接口请求失败，详细错误: $err', tag: '登录接口');
+          return null;
         });
-    if (data is! bool) {
-      final token = data['token'] as String?;
-      if (token == null || token.isEmpty) {
-        throw Exception('登录失败，未获取到有效Token');
-      }
-      return token;
-    } else {
-      return null;
-    }
+    if (data == null) return data;
+    final token = data['body']['token'] as String?;
+    return token!.isEmpty ? null : token; // 把空字符串的情况也处理成null
   }
 }
 

@@ -31,6 +31,11 @@ class _LoginPageState extends ConsumerState<LoginPage>
   late AnimationController _pageFadeController; // 控制整个登录页面的渐隐
   late AnimationController _backgroundController; // 背景动画控制器
 
+  late Animation<double> _contentAlpha;
+  late Animation<double> _welcomeAlpha;
+  late Animation<Offset> _welcomeSlide;
+  late Animation<double> _pageAlpha;
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +60,31 @@ class _LoginPageState extends ConsumerState<LoginPage>
       vsync: this,
       duration: const Duration(seconds: 10),
     )..repeat();
+
+    // 反向 Animation 让内容从 1 渐隐到 0
+    // Tween 只是简单的定义数值范围 但因其继承自 Animatable 所以也拥有 animate 方法 将自身的范围绑定到Animation上
+    _contentAlpha = Tween<double>(begin: 1, end: 0).animate(
+      // 曲线计算公式 定义变化速度
+      // parent指定由哪个控制器套用该计算公式
+      CurvedAnimation(parent: _contentFadeController, curve: Curves.easeInOut),
+    );
+    _welcomeAlpha = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _welcomeFadeController,
+        curve: const Interval(0, 0.7, curve: Curves.easeInOut),
+      ),
+    );
+    // 欢迎文字从屏幕下方往上滑动的动画
+    _welcomeSlide = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _welcomeFadeController,
+            curve: Curves.easeOutBack,
+          ),
+        );
+    _pageAlpha = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(parent: _pageFadeController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -78,11 +108,12 @@ class _LoginPageState extends ConsumerState<LoginPage>
       setState(() {
         _isLoading = true;
       });
-      try {
-        // 1. 模拟网络请求（实际开发请调用你的 dio_client.dart）
-        await Future.delayed(const Duration(seconds: 2));
-        // 调用你 global_notifier 内的方法更新状态
-        // await ref.read(authProvider.notifier).login(_usernameController.text, _passwordController.text);
+
+      // 1. 获取token
+      final isSuccess = await ref
+          .read(authProvider.notifier)
+          .login(_usernameController.text, _passwordController.text);
+      if (isSuccess) {
         // 3. 开启第一阶段动画：输入框等组件渐隐
         setState(() {
           _isLoginSuccess = true;
@@ -103,7 +134,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
           // pushReplacementNamed 会把当前页面从路由栈中移除 用一个新的页面替换它
           // Navigator.pushReplacementNamed(context, '/main_page'); // 确保后退不会回到登录页
         }
-      } catch (e) {
+      } else {
         // 异常处理：重置按钮加载状态
         setState(() {
           _isLoading = false;
@@ -115,7 +146,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
           // ScaffoldMessenger 是消息管理器
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('登录失败: $e')));
+          ).showSnackBar(SnackBar(content: Text('登录失败')));
         }
       }
     }
@@ -123,30 +154,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
 
   @override
   Widget build(BuildContext context) {
-    // 反向 Animation 让内容从 1 渐隐到 0
-    // Tween 只是简单的定义数值范围 但因其继承自 Animatable 所以也拥有 animate 方法 将自身的范围绑定到Animation上
-    final _contentAlpha = Tween<double>(begin: 1, end: 0).animate(
-      // 曲线计算公式 定义变化速度
-      // parent指定由哪个控制器套用该计算公式
-      CurvedAnimation(parent: _contentFadeController, curve: Curves.easeInOut),
-    );
-    final _welcomeAlpha = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _welcomeFadeController,
-        curve: const Interval(0, 0.7, curve: Curves.easeInOut),
-      ),
-    );
-    // 欢迎文字从屏幕下方往上滑动的动画
-    final _welcomeSlide =
-        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _welcomeFadeController,
-            curve: Curves.easeOutBack,
-          ),
-        );
-    final _pageAlpha = Tween<double>(begin: 1, end: 0).animate(
-      CurvedAnimation(parent: _pageFadeController, curve: Curves.easeInOut),
-    );
     return GestureDetector(
       // 点击屏幕任意空白处皆可收起键盘
       onTap: () => FocusScope.of(context).unfocus(),
@@ -166,15 +173,17 @@ class _LoginPageState extends ConsumerState<LoginPage>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.blue.withOpacity(
-                            0.05 +
+                          Colors.blue.withValues(
+                            alpha:
+                                0.05 +
                                 0.05 *
                                     math.sin(
                                       _backgroundController.value * 2 * math.pi,
                                     ),
                           ),
-                          Colors.purple.withOpacity(
-                            0.05 +
+                          Colors.purple.withValues(
+                            alpha:
+                                0.05 +
                                 0.05 *
                                     math.cos(
                                       _backgroundController.value * 2 * math.pi,
@@ -275,6 +284,13 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                   ElevatedButton(
                                     onPressed: _isLoading ? null : _handleLogin,
                                     style: ElevatedButton.styleFrom(
+                                      // 设置正常状态下的背景色和文字/图标色（这里用系统主题蓝色，可自行换成其他颜色）
+                                      backgroundColor: Colors.blueAccent,
+                                      foregroundColor: Colors.white,
+                                      // 强制设置“禁用状态”下的背景色与正常状态一致，防止点击变色
+                                      disabledBackgroundColor: Colors.blueAccent
+                                          .withValues(alpha: 0.7),
+                                      disabledForegroundColor: Colors.white,
                                       padding: EdgeInsets.symmetric(
                                         vertical: 16.rpx,
                                       ),
@@ -283,6 +299,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                           12.rpx,
                                         ),
                                       ),
+                                      elevation: 2, // 加一点微微的阴影显得更有质感
                                     ),
                                     child: AnimatedSwitcher(
                                       duration: const Duration(

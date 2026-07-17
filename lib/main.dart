@@ -7,6 +7,9 @@ import 'components/common_api.dart';
 import 'view/chat_log_page.dart';
 import 'view/chat_detail_page.dart';
 
+// 定义全局的 navigatorKey
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   // runApp内部会自动调用一次 但是如果要在runApp之前使用Flutter绑定的功能 需要手动调用（如初始化插件、调用平台通道、获取屏幕信息）
   // WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +27,9 @@ class MyApp extends StatelessWidget {
     ScreenSize.init(context);
 
     return MaterialApp(
+      // MaterialApp 内部会创建一个 Navigator 如果不绑定 navigatorKey，只能在 widget 内部通过 Navigator.of(context) 找到它
+      // 绑定后 就能在全局通过 navigatorKey.currentState 操作路由，不依赖 context
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

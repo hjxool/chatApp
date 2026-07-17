@@ -1,5 +1,7 @@
 // 全局设置请求拦截器等通用配置
+import 'package:chat_app/main.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 // 单例模式
 // 使用示例 dio = DioClient().dio
@@ -56,15 +58,82 @@ final dio =
       )
       ..interceptors.add(
         InterceptorsWrapper(
+          // 添加请求头
           onRequest: (options, handler) {
             if (_token != null) {
               options.headers['Authorization'] = 'Bearer $_token';
             }
             return handler.next(options);
           },
+          // 过滤响应结果
+          onResponse: (response, handler) {
+            final data = response.data;
+            if (data is Map && data['head']['code'] != 200) {
+              final errorMsg = data['head']['message'] ?? '请求失败，请稍后重试';
+              _showErrorDialog(errorMsg);
+
+              // 业务码不是200的也转到 onError
+              return handler.reject(
+                DioException(
+                  requestOptions: response.requestOptions,
+                  response: response,
+                  error: errorMsg,
+                  type: DioExceptionType.badResponse,
+                ),
+              );
+            }
+            return handler.next(response);
+          },
+          // 处理网络请求异常 200–299 以外的响应会进入onError
+          onError: (error, handler) {
+            String errorMsg = '网络好像有点问题，请检查网络设置';
+            if (error.type == DioExceptionType.connectionTimeout ||
+                error.type == DioExceptionType.receiveTimeout) {
+              errorMsg = '网络连接超时';
+            } else if (error.response != null) {
+              // HTTP 状态码错误
+              errorMsg = '服务器异常 (${error.response?.statusCode})';
+            }
+            _showErrorDialog(errorMsg);
+            return handler.next(error);
+          },
         ),
       );
+
 // 导出一个修改 Token 的全局函数
 void updateToken(String token) {
   _token = token;
+}
+
+// 提取统一弹窗的私有函数
+void _showErrorDialog(String message) {
+  // 从全局 navigatorKey 中获取当前最顶层的 context
+  final context = navigatorKey.currentContext;
+  if (context == null) return;
+  // 使用 WidgetsBinding 确保在当前帧渲染完成后再弹窗，防止在请求极快时与页面构建产生冲突
+  // WidgetsBinding 是应用级别的绑定对象，而不是某个 Widget 的实例 用于将 Widget层和 Flutter Engine（渲染层）绑定起来
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // 点击背景可以关闭
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.error, color: Colors.red),
+            SizedBox(width: 8),
+            Text('提示'),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            // Navigator.of 找到的是和当前 BuildContext 最近的 Navigator
+            // navigatorKey.currentState 操作的是全局 Navigator 用全局的容易导致路由页面也关掉
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
+  });
 }
