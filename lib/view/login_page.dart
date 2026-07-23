@@ -144,9 +144,9 @@ class _LoginPageState extends ConsumerState<LoginPage>
           // StatefulWidget 自带 context 因为当前类继承自 State
           // 而 StatelessWidget 不是 State 类 因此必须通过参数传递才能使用 context
           // ScaffoldMessenger 是消息管理器
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('登录失败')));
+          // ScaffoldMessenger.of(
+          //   context,
+          // ).showSnackBar(SnackBar(content: Text('登录失败')));
         }
       }
     }
