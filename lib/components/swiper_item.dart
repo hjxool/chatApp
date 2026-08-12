@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chat_app/components/common_api.dart';
@@ -8,8 +7,6 @@ class SwiperItem extends ConsumerStatefulWidget {
   final Widget content;
   final List<SwiperButton>? rightButtons;
   final double? rightWidth;
-  // 里面的泛型要写全 否则ref.watch会报类型错误
-  final NotifierProvider<SwiperNotifier, SwiperState>? provider;
   final int? itemIndex;
 
   const SwiperItem({
@@ -17,7 +14,6 @@ class SwiperItem extends ConsumerStatefulWidget {
     required this.content,
     this.rightButtons,
     this.rightWidth,
-    this.provider,
     this.itemIndex,
   });
 
@@ -35,8 +31,6 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
   late AnimationController _controller; // 动画控制器
   late Animation<double> _animation; // 动画进度 映射的真实位移值
   int? topButtonIndex; // 展示在最上层的按钮索引
-  // 保存监听引用 在应用热重启时清理残余订阅 防止riverpod订阅出现异常
-  ProviderSubscription<SwiperState>? _providerSubscribe;
   bool topButtonIndexToNull = false; // 是否从放大按钮还原回普通按钮
 
   @override
@@ -59,26 +53,11 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
           });
         });
     }
-    // 在这设置监听更安全 能保证 context 已经稳定
-    _providerSubscribe?.close(); // 如果存在订阅先清除 防止重复订阅
-    if (widget.provider != null) {
-      // 添加openIndex监听
-      _providerSubscribe = ref.listenManual<SwiperState>(widget.provider!, (
-        pre,
-        now,
-      ) {
-        if (now.openIndex != widget.itemIndex) {
-          // 不是自身 则折叠
-          _foldAnimation(0);
-        }
-      });
-    }
   }
 
   @override
   void dispose() {
     _controller.dispose(); // 释放动画资源
-    _providerSubscribe?.close(); // 取消监听
     super.dispose();
   }
 
@@ -139,6 +118,13 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
 
   @override
   Widget build(BuildContext context) {
+    // 动态监听 openIndex，若不是当前 Item 则自动收起折叠
+    ref.listen<SwiperState>(swiperProvider, (previous, next) {
+      if (next.openIndex != widget.itemIndex) {
+        _foldAnimation(0);
+      }
+    });
+
     return GestureDetector(
       onHorizontalDragUpdate: _dragUpdate,
       onHorizontalDragEnd: _dragEnd,
@@ -146,9 +132,9 @@ class _SwiperItemState extends ConsumerState<SwiperItem>
         // 已展开 且 有按钮放大 触发按钮还原动画
         topButtonIndexToNull =
             (_dx.abs() == widget.rightWidth) && (topButtonIndex != null);
-        if (widget.provider != null && widget.itemIndex != null) {
+        if (widget.itemIndex != null) {
           // 打开对应行
-          ref.read(widget.provider!.notifier).open(widget.itemIndex!);
+          ref.read(swiperProvider.notifier).open(widget.itemIndex!);
         }
         // 拖拽时重置 topButtonIndex 清除动画延迟时间 并手动计算展开过程
         setState(() {

@@ -22,10 +22,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 当前页管理Swiper组件的数据源
-    final swiperProvider = NotifierProvider<SwiperNotifier, SwiperState>(
-      SwiperNotifier.new,
-    );
+    final GlobalKey btnKey = GlobalKey(); // 用于获取导航栏按钮尺寸定位
 
     // 测试数据
     List<ItemType> listData = List.generate(
@@ -58,59 +55,62 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ],
           rightWidth: 360.rpx,
-          provider: swiperProvider,
           itemIndex: index,
         ),
         key: ValueKey('Item $index'),
       ),
     );
 
-    final GlobalKey btnKey = GlobalKey(); // 用于获取导航栏按钮尺寸定位
-
-    return Scaffold(
-      appBar: CusAppBar(
-        title: 'ChatWithMe',
-        actions: [
-          IconButton(
-            key: btnKey,
-            onPressed: () {
-              CusShowMenu.popMenu(
-                buttonKey: btnKey,
-                context: context,
-                items: [
-                  PopupMenuItem(
-                    value: 'add',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person_add, color: Colors.white),
-                        SizedBox(width: 10.rpx),
-                        Text('添加朋友', style: TextStyle(color: Colors.white)),
-                      ],
+    return ProviderScope(
+      overrides: [
+        // 使用 overrides 重写全局 swiperProvider，为当前页面隔离独立的 SwiperNotifier 实例
+        swiperProvider.overrideWith(SwiperNotifier.new),
+      ],
+      child: Scaffold(
+        appBar: CusAppBar(
+          title: 'ChatWithMe',
+          actions: [
+            IconButton(
+              key: btnKey,
+              onPressed: () {
+                CusShowMenu.popMenu(
+                  buttonKey: btnKey,
+                  context: context,
+                  items: [
+                    PopupMenuItem(
+                      value: 'add',
+                      child: Row(
+                        children: [
+                          Icon(Icons.person_add, color: Colors.white),
+                          SizedBox(width: 10.rpx),
+                          Text('添加朋友', style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'scan',
-                    child: Row(
-                      children: [
-                        Icon(Icons.qr_code_scanner, color: Colors.white),
-                        SizedBox(width: 10.rpx),
-                        Text('扫一扫', style: TextStyle(color: Colors.white)),
-                      ],
+                    PopupMenuItem(
+                      value: 'scan',
+                      child: Row(
+                        children: [
+                          Icon(Icons.qr_code_scanner, color: Colors.white),
+                          SizedBox(width: 10.rpx),
+                          Text('扫一扫', style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-            icon: Icon(Icons.add, color: Colors.black),
-          ),
-        ],
-      ),
-      body: CusList(
-        listData: listData,
-        onReady: (OnReadyCallback callbacks) {
-          // addItemFn = callbacks.addFn;
-          removeFn = callbacks.removeFn;
-        },
+                  ],
+                );
+              },
+              icon: Icon(Icons.add, color: Colors.black),
+            ),
+          ],
+        ),
+        body: CusList(
+          listData: listData,
+          onReady: (OnReadyCallback callbacks) {
+            // addItemFn = callbacks.addFn;
+            removeFn = callbacks.removeFn;
+          },
+        ),
       ),
     );
   }

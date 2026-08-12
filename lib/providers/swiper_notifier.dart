@@ -23,3 +23,9 @@ class SwiperNotifier extends Notifier<SwiperState> {
     state = state.copyWith(openIndex: index);
   }
 }
+
+// 全局 SwiperProvider，配合 ProviderScope 进行局部隔离与状态管理
+final swiperProvider = NotifierProvider<SwiperNotifier, SwiperState>(
+  SwiperNotifier.new,
+);
+
