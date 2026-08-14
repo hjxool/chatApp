@@ -1,3 +1,4 @@
+import 'package:chat_app/view/register_page.dart';
 import 'package:chat_app/view/root_auth_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -64,6 +65,9 @@ class MyApp extends StatelessWidget {
             break;
           case '/chat_detail':
             builder = (_) => const ChatDetailPage();
+            break;
+          case '/register_page':
+            builder = (_) => const RegisterPage();
             break;
           default:
             // 路由默认兜底也回到包装器

@@ -1,8 +1,8 @@
+import 'package:chat_app/components/animated_background.dart';
 import 'package:chat_app/components/common_api.dart';
 import 'package:chat_app/providers/global_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:math' as math;
 
 class LoginPage extends ConsumerStatefulWidget {
   // 添加一个动画完成后的回调
@@ -29,7 +29,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
   late AnimationController _contentFadeController; // 控制输入框等组件的渐隐
   late AnimationController _welcomeFadeController; // 控制“欢迎，xxx”的渐显
   late AnimationController _pageFadeController; // 控制整个登录页面的渐隐
-  late AnimationController _backgroundController; // 背景动画控制器
 
   late Animation<double> _contentAlpha;
   late Animation<double> _welcomeAlpha;
@@ -55,11 +54,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    // 背景循环动画
-    _backgroundController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 10),
-    )..repeat();
 
     // 反向 Animation 让内容从 1 渐隐到 0
     // Tween 只是简单的定义数值范围 但因其继承自 Animatable 所以也拥有 animate 方法 将自身的范围绑定到Animation上
@@ -94,7 +88,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
     _contentFadeController.dispose();
     _welcomeFadeController.dispose();
     _pageFadeController.dispose();
-    _backgroundController.dispose();
     super.dispose(); // 最后清理父类 避免子类使用的资源被清理导致错误
   }
 
@@ -164,38 +157,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
           body: Stack(
             children: [
               // 流光特效背景层
-              AnimatedBuilder(
-                animation: _backgroundController,
-                builder: (BuildContext context, Widget? child) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.blue.withValues(
-                            alpha:
-                                0.05 +
-                                0.05 *
-                                    math.sin(
-                                      _backgroundController.value * 2 * math.pi,
-                                    ),
-                          ),
-                          Colors.purple.withValues(
-                            alpha:
-                                0.05 +
-                                0.05 *
-                                    math.cos(
-                                      _backgroundController.value * 2 * math.pi,
-                                    ),
-                          ),
-                          Colors.white,
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+              const AnimatedBackground(),
               // 主体部分
               SafeArea(
                 child: Center(
@@ -279,7 +241,25 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                         ? '请输入密码'
                                         : null,
                                   ),
-                                  SizedBox(height: 24.rpx),
+                                  // 忘记密码入口
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/forgot_password_page',
+                                        );
+                                      },
+                                      child: Text(
+                                        '忘记密码？',
+                                        style: TextStyle(
+                                          fontSize: 28.rpx,
+                                          color: Colors.blueAccent,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                   // 登录按钮 (使用 AnimatedSwitcher 实现文字变加载图标)
                                   ElevatedButton(
                                     onPressed: _isLoading ? null : _handleLogin,
@@ -321,6 +301,36 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                               ),
                                             ),
                                     ),
+                                  ),
+                                  SizedBox(height: 24.rpx),
+                                  // 注册入口
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '还没有账号？',
+                                        style: TextStyle(
+                                          fontSize: 30.rpx,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/register_page',
+                                          );
+                                        },
+                                        child: Text(
+                                          '立即注册',
+                                          style: TextStyle(
+                                            fontSize: 30.rpx,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blueAccent,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
