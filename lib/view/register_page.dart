@@ -17,7 +17,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   // GlobalKey 提供跨 Widget 层级访问某个 StatefulWidget 的 State
   // Form 组件虽然是StatefulWidget 但是并没有将其对应的state私有化 就是为了将其内部状态暴露出来 以供使用
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
+  final _nicknameController = TextEditingController();
   final _emailController = TextEditingController();
   final _codeController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -83,7 +83,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   void dispose() {
     _timer?.cancel();
-    _usernameController.dispose();
+    _nicknameController.dispose();
     _emailController.dispose();
     _codeController.dispose();
     _passwordController.dispose();
@@ -139,9 +139,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             SizedBox(height: 36.rpx),
                             // 用户名
                             TextFormField(
-                              controller: _usernameController,
+                              controller: _nicknameController,
                               decoration: InputDecoration(
-                                labelText: '用户名/邮箱',
+                                labelText: '昵称',
                                 prefixIcon: const Icon(Icons.person_outline),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.rpx),
@@ -159,16 +159,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                               decoration: InputDecoration(
                                 labelText: '邮箱 / 手机号',
                                 prefixIcon: const Icon(Icons.email_outlined),
-                                suffixIcon: IconButton(
-                                  onPressed: () => setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  }),
-                                  icon: Icon(
-                                    _isPasswordVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.rpx),
                                 ),
@@ -201,31 +191,36 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                   ),
                                 ),
                                 SizedBox(width: 12.rpx),
-                                SizedBox(
-                                  height: 52.rpx,
-                                  // 按钮组件 都是根据内部大小撑开 因此想要固定高度 需要外部包裹容器约束
-                                  child: OutlinedButton(
-                                    onPressed: _countdownSeconds == 0
-                                        ? _startCountdown
-                                        : null,
-                                    style: OutlinedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          12.rpx,
-                                        ),
+                                ElevatedButton(
+                                  onPressed: _countdownSeconds == 0
+                                      ? _startCountdown
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blueAccent,
+                                    foregroundColor: Colors.white,
+                                    disabledBackgroundColor: Colors.blueAccent
+                                        .withValues(alpha: 0.7),
+                                    disabledForegroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 20.rpx,
+                                      horizontal: 16.rpx,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        12.rpx,
                                       ),
                                     ),
-                                    child: Text(
-                                      _countdownSeconds > 0
-                                          ? '${_countdownSeconds}s 后重新发送'
-                                          : '获取验证码',
-                                      style: TextStyle(fontSize: 24.rpx),
-                                    ),
+                                  ),
+                                  child: Text(
+                                    _countdownSeconds > 0
+                                        ? '${_countdownSeconds}s 后重新发送'
+                                        : '获取验证码',
+                                    style: TextStyle(fontSize: 24.rpx),
                                   ),
                                 ),
-                                SizedBox(height: 16.rpx),
                               ],
                             ),
+                            SizedBox(height: 20.rpx),
                             // 密码
                             TextFormField(
                               controller: _passwordController,
@@ -317,13 +312,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                     : Text(
                                         '注 册',
                                         style: TextStyle(
-                                          fontSize: 18.rpx,
+                                          fontSize: 30.rpx,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                               ),
                             ),
-                            SizedBox(height: 16.rpx),
                           ],
                         ),
                       ),
