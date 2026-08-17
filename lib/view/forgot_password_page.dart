@@ -5,47 +5,60 @@ import 'package:chat_app/components/common_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// 注册页面
-class RegisterPage extends ConsumerStatefulWidget {
-  const RegisterPage({super.key});
+// 忘记密码页面
+class ForgotPasswordPage extends ConsumerStatefulWidget {
+  const ForgotPasswordPage({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _RegisterPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _ForgotPasswordPageState();
 }
 
-class _RegisterPageState extends ConsumerState<RegisterPage> {
-  // GlobalKey 提供跨 Widget 层级访问某个 StatefulWidget 的 State
-  // Form 组件虽然是StatefulWidget 但是并没有将其对应的state私有化 就是为了将其内部状态暴露出来 以供使用
+class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nicknameController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _accountController = TextEditingController();
   final _codeController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
+  final _newPasswordController = TextEditingController();
+  bool _isNewPasswordVisible = false;
   final _confirmPasswordController = TextEditingController();
   bool _isConfirmPasswordVisible = false;
+  bool _isLoading = false;
+  void _handleResetPassword() async {
+    FocusScope.of(context).unfocus();
+    // 触发所有表单校验
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      // TODO: 调用重置密码 API
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('密码重置成功，请重新登录')));
+        Navigator.pop(context);
+      }
+    }
+  }
 
   // 验证码倒计时
-  Timer? _timer; // 保存定时器变量 后续清除定时器
   int _countdownSeconds = 0;
+  Timer? _timer;
   void _startCountdown() {
-    if (_emailController.text.trim().isEmpty) {
+    if (_accountController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('请先输入邮箱或手机号')));
+      ).showSnackBar(const SnackBar(content: Text('请先输入绑定邮箱/手机号')));
       return;
     }
     setState(() {
       _countdownSeconds = 60;
     });
-    // 固定时间自动执行一次回调函数
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_countdownSeconds > 1) {
         setState(() {
           _countdownSeconds--;
         });
       } else {
-        // 倒计时结束
         _timer?.cancel();
         setState(() {
           _countdownSeconds = 0;
@@ -54,39 +67,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     });
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('验证码已发送')));
-  }
-
-  bool _isLoading = false;
-  void _handleRegister() async {
-    //  清除当前组件内焦点
-    FocusScope.of(context).unfocus();
-    // 执行表单校验
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      // TODO: 调用注册 API
-      await Future.delayed(const Duration(seconds: 2));
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('注册成功，请登录')));
-        Navigator.pop(context);
-      }
-    }
+    ).showSnackBar(const SnackBar(content: Text('重置验证码已发送')));
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    _nicknameController.dispose();
-    _emailController.dispose();
+    _accountController.dispose();
     _codeController.dispose();
-    _passwordController.dispose();
+    _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
@@ -100,7 +89,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           SafeArea(
             child: Column(
               children: [
-                // 顶部返回按钮
                 Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
@@ -113,14 +101,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       padding: EdgeInsets.symmetric(horizontal: 24.rpx),
-                      // Form 是为了通过currentState统一校验
                       child: Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              '创建新账号',
+                              '找回密码',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 30.rpx,
@@ -129,7 +116,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             ),
                             SizedBox(height: 8.rpx),
                             Text(
-                              '注册以开始您的全新体验',
+                              '验证账号信息以设置新密码',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 30.rpx,
@@ -137,39 +124,25 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                               ),
                             ),
                             SizedBox(height: 36.rpx),
-                            // 用户名
+                            // 绑定邮箱/手机号
                             TextFormField(
-                              controller: _nicknameController,
+                              controller: _accountController,
                               decoration: InputDecoration(
-                                labelText: '昵称',
-                                prefixIcon: const Icon(Icons.person_outline),
+                                labelText: '绑定邮箱 / 手机号',
+                                prefixIcon: const Icon(
+                                  Icons.account_box_outlined,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.rpx),
                                 ),
                               ),
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
-                                  ? '请输入用户名'
-                                  : null,
-                            ),
-                            SizedBox(height: 16.rpx),
-                            // 邮箱/手机号
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                labelText: '邮箱 / 手机号',
-                                prefixIcon: const Icon(Icons.email_outlined),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.rpx),
-                                ),
-                              ),
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
+                              validator: (val) =>
+                                  (val == null || val.trim().isEmpty)
                                   ? '请输入邮箱或手机号'
                                   : null,
                             ),
                             SizedBox(height: 16.rpx),
-                            // 验证码
+                            // 验证码输入与获取按钮
                             Row(
                               children: [
                                 Expanded(
@@ -177,15 +150,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                     controller: _codeController,
                                     decoration: InputDecoration(
                                       labelText: '验证码',
-                                      prefixIcon: Icon(Icons.verified_outlined),
+                                      prefixIcon: const Icon(
+                                        Icons.verified_outlined,
+                                      ),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(
                                           12.rpx,
                                         ),
                                       ),
                                     ),
-                                    validator: (value) =>
-                                        (value == null || value.trim().isEmpty)
+                                    validator: (val) =>
+                                        (val == null || val.trim().isEmpty)
                                         ? '请输入验证码'
                                         : null,
                                   ),
@@ -220,20 +195,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 20.rpx),
-                            // 密码
+                            SizedBox(height: 16.rpx),
+                            // 新密码
                             TextFormField(
-                              controller: _passwordController,
-                              obscureText: !_isPasswordVisible,
+                              controller: _newPasswordController,
+                              obscureText: !_isNewPasswordVisible,
                               decoration: InputDecoration(
-                                labelText: '密码',
+                                labelText: '新密码',
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
-                                  onPressed: () => setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  }),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isNewPasswordVisible =
+                                          !_isNewPasswordVisible;
+                                    });
+                                  },
                                   icon: Icon(
-                                    _isPasswordVisible
+                                    _isNewPasswordVisible
                                         ? Icons.visibility
                                         : Icons.visibility_off,
                                   ),
@@ -242,30 +220,28 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                   borderRadius: BorderRadius.circular(12.rpx),
                                 ),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return '请输入密码';
-                                } else if (value.contains(' ')) {
-                                  return '密码不能包含空格';
-                                } else if (value.length < 6) {
-                                  return '密码长度不能少于6位';
-                                }
-                                return null; // 返回null组件才认为校验通过
+                              validator: (val) {
+                                if (val == null || val.isEmpty) return '请输入密码';
+                                if (val.contains(' ')) return '密码不能包含空格';
+                                if (val.length < 6) return '密码长度不能少于6位';
+                                return null;
                               },
                             ),
                             SizedBox(height: 16.rpx),
-                            // 确认密码
+                            // 确认新密码
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: !_isConfirmPasswordVisible,
                               decoration: InputDecoration(
-                                labelText: '确认密码',
+                                labelText: '确认新密码',
                                 prefixIcon: const Icon(Icons.lock_reset),
                                 suffixIcon: IconButton(
-                                  onPressed: () => setState(
-                                    () => _isConfirmPasswordVisible =
-                                        !_isConfirmPasswordVisible,
-                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isConfirmPasswordVisible =
+                                          !_isConfirmPasswordVisible;
+                                    });
+                                  },
                                   icon: Icon(
                                     _isConfirmPasswordVisible
                                         ? Icons.visibility
@@ -276,18 +252,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                   borderRadius: BorderRadius.circular(12.rpx),
                                 ),
                               ),
-                              validator: (value) {
-                                // TextEditingController 的text是纯文本 value是完整的编辑状态 包含光标位置、文本内容等
-                                if (value != _passwordController.text) {
+                              validator: (val) {
+                                if (val != _newPasswordController.text) {
                                   return '两次输入的密码不一致';
                                 }
                                 return null;
                               },
                             ),
-                            SizedBox(height: 20.rpx),
-                            // 注册按钮
+                            SizedBox(height: 28.rpx),
+                            // 重置密码提交按钮
                             ElevatedButton(
-                              onPressed: _isLoading ? null : _handleRegister,
+                              onPressed: _isLoading
+                                  ? null
+                                  : _handleResetPassword,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blueAccent,
                                 foregroundColor: Colors.white,
@@ -310,7 +287,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                         ),
                                       )
                                     : Text(
-                                        '注 册',
+                                        '重置密码',
                                         style: TextStyle(
                                           fontSize: 30.rpx,
                                           fontWeight: FontWeight.bold,

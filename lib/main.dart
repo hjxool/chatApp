@@ -1,3 +1,4 @@
+import 'package:chat_app/view/forgot_password_page.dart';
 import 'package:chat_app/view/register_page.dart';
 import 'package:chat_app/view/root_auth_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,9 @@ class MyApp extends StatelessWidget {
             break;
           case '/register_page':
             builder = (_) => const RegisterPage();
+            break;
+          case '/forgot_password_page':
+            builder = (_) => const ForgotPasswordPage();
             break;
           default:
             // 路由默认兜底也回到包装器
