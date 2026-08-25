@@ -68,19 +68,27 @@ final dio =
           // 过滤响应结果
           onResponse: (response, handler) {
             final data = response.data;
-            if (data is Map && data['head']['code'] != 200) {
-              final errorMsg = data['head']['message'] ?? '请求失败，请稍后重试';
-              _showErrorDialog(errorMsg);
-
-              // 业务码不是200的也转到 onError
-              return handler.reject(
-                DioException(
-                  requestOptions: response.requestOptions,
-                  response: response,
-                  error: errorMsg,
-                  type: DioExceptionType.badResponse,
-                ),
-              );
+            if (data is Map) {
+              final code = data['head']?['code'] ?? data['code'];
+              final body = data['body'];
+              // 剥离外层head 只返回布尔值或实际数据
+              if (code == 200 || code == '200') {
+                // 若 body 为 null、空 Map 或空 List/String，则返回 true，否则返回具体 body
+                if (body == null ||
+                    (body is Map && body.isEmpty) ||
+                    (body is Iterable && body.isEmpty) ||
+                    (body is String && body.trim().isEmpty)) {
+                  response.data = true;
+                } else {
+                  response.data = body;
+                }
+              } else {
+                // 业务失败 (code 为 200 以外的值)
+                final errorMsg =
+                    data['head']?['message'] ?? data['message'] ?? '请求失败，请稍后重试';
+                _showErrorDialog(errorMsg.toString());
+                response.data = false;
+              }
             }
             return handler.next(response);
           },
@@ -92,7 +100,16 @@ final dio =
               errorMsg = '网络连接超时';
             } else if (error.response != null) {
               // HTTP 状态码错误
-              errorMsg = '服务器异常 (${error.response?.statusCode})';
+              final responseData = error.response?.data;
+              if (responseData is Map) {
+                errorMsg =
+                    (responseData['head']?['message'] ??
+                            responseData['message'] ??
+                            '服务器异常 (${error.response?.statusCode})')
+                        .toString();
+              } else {
+                errorMsg = '服务器异常 (${error.response?.statusCode})';
+              }
             }
             _showErrorDialog(errorMsg);
             return handler.next(error);
