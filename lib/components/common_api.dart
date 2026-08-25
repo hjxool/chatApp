@@ -2,42 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'dart:developer' as developer;
 import 'package:intl/intl.dart';
 
-// 全局版本
-// class ScreenSize with WidgetsBindingObserver {
-//   static late double width;
-//   static late double height;
-//   static late double scaleWidth;
-//   static late double designWidth;
-//   // 单例模式 因为注册监听器需要一个不会变的实例
-//   static final ScreenSize _instance = ScreenSize();
-//   factory ScreenSize() => _instance;
-
-//   static void init({double designWidth = 750}) {
-//     ScreenSize.designWidth = designWidth;
-//     _updateSize();
-//     // 注册监听器
-//     WidgetsBinding.instance.addObserver(_instance);
-//   }
-
-//   static void _updateSize() {
-//     // 访问 platformDispatcher.views.first 会触发 didChangeMetrics 事件 导致死循环
-//     final view = WidgetsBinding.instance.platformDispatcher.views.first;
-//     // WidgetsBinding只能获取到物理像素 除以设备像素比 得到逻辑像素
-//     final logicalSize = view.physicalSize / view.devicePixelRatio;
-//     width = logicalSize.width;
-//     height = logicalSize.height;
-//     scaleWidth = width / designWidth;
-
-//     print('屏幕尺寸更新: width=$width, height=$height');
-//   }
-
-//   // 屏幕尺寸变化时触发
-//   @override
-//   void didChangeMetrics() {
-//     _updateSize();
-//   }
-// }
-
 // 使用context版本
 class ScreenSize {
   static late double width;
@@ -108,3 +72,24 @@ bool _hasToJson(dynamic obj) {
 }
 
 typedef JsonMap = Map<String, dynamic>;
+
+// 登陆账号类型
+enum AccountType { email, phone, invalid }
+
+// 账号类型识别与正则校验
+AccountType checkAccountType(String input) {
+  final text = input.trim();
+  if (text.isEmpty) return AccountType.invalid;
+  // r'...' 代表原始字符串 作用是让字符串内的反斜杠 \ 保持原样，不需要写成 \\ 来转义
+  final phoneRegex = RegExp(
+    r'^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$',
+  );
+  // 里面有单引号外面用双引号
+  final emailRegex = RegExp(r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$");
+  if (phoneRegex.hasMatch(text)) {
+    return AccountType.phone;
+  } else if (emailRegex.hasMatch(text)) {
+    return AccountType.email;
+  }
+  return AccountType.invalid;
+}

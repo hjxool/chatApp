@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:chat_app/components/animated_background.dart';
 import 'package:chat_app/components/common_api.dart';
 import 'package:flutter/material.dart';
@@ -29,12 +28,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   Timer? _timer; // 保存定时器变量 后续清除定时器
   int _countdownSeconds = 0;
   void _startCountdown() {
-    if (_emailController.text.trim().isEmpty) {
+    final input = _emailController.text.trim();
+    final accountType = checkAccountType(input);
+    if (accountType == AccountType.invalid) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('请先输入邮箱或手机号')));
+      ).showSnackBar(const SnackBar(content: Text('请输入正确的邮箱或手机号格式')));
       return;
     }
+    // 开启倒计时
     setState(() {
       _countdownSeconds = 60;
     });
@@ -52,9 +54,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         });
       }
     });
+
+    final typeText = accountType == AccountType.phone ? '手机' : '邮箱';
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('验证码已发送')));
+    ).showSnackBar(SnackBar(content: Text('验证码已发送至您的$typeText')));
   }
 
   bool _isLoading = false;
@@ -163,10 +167,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                   borderRadius: BorderRadius.circular(12.rpx),
                                 ),
                               ),
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
-                                  ? '请输入邮箱或手机号'
-                                  : null,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return '请输入邮箱或手机号';
+                                }
+                                if (checkAccountType(value) ==
+                                    AccountType.invalid) {
+                                  return '请输入有效的手机号或邮箱格式';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 16.rpx),
                             // 验证码

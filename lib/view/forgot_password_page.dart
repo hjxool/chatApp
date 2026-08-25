@@ -44,12 +44,15 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   int _countdownSeconds = 0;
   Timer? _timer;
   void _startCountdown() {
-    if (_accountController.text.trim().isEmpty) {
+    final input = _accountController.text.trim();
+    final accountType = checkAccountType(input);
+    if (accountType == AccountType.invalid) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('请先输入绑定邮箱/手机号')));
+      ).showSnackBar(const SnackBar(content: Text('请输入正确的邮箱或手机号格式')));
       return;
     }
+    // 开启倒计时
     setState(() {
       _countdownSeconds = 60;
     });
@@ -65,9 +68,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         });
       }
     });
+
+    final typeText = accountType == AccountType.phone ? '手机' : '邮箱';
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('重置验证码已发送')));
+    ).showSnackBar(SnackBar(content: Text('重置验证码已发送至您的$typeText')));
   }
 
   @override
@@ -136,10 +141,16 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                                   borderRadius: BorderRadius.circular(12.rpx),
                                 ),
                               ),
-                              validator: (val) =>
-                                  (val == null || val.trim().isEmpty)
-                                  ? '请输入邮箱或手机号'
-                                  : null,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return '请输入邮箱或手机号';
+                                }
+                                if (checkAccountType(value) ==
+                                    AccountType.invalid) {
+                                  return '请输入有效的手机号或邮箱格式';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 16.rpx),
                             // 验证码输入与获取按钮
