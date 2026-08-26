@@ -112,7 +112,10 @@ final dio =
               }
             }
             _showErrorDialog(errorMsg);
-            return handler.next(error);
+            // 将网络异常转换为普通成功响应返回 false，不再抛出异常给业务层
+            return handler.resolve(
+              Response(requestOptions: error.requestOptions, data: false),
+            );
           },
         ),
       );

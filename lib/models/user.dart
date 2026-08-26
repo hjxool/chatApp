@@ -58,13 +58,9 @@ class UserApi {
   }) async {
     final data = await dio
         .post('/api/login', data: {'username': username, 'password': password})
-        .then((res) => res.data)
-        .catchError((err) {
-          consoleLog('登录接口请求失败，详细错误: $err', tag: '登录接口');
-          return null;
-        });
-    if (data == null) return data;
-    final token = data['body']['token'] as String?;
+        .then((res) => res.data);
+    if (data is! Map) return null;
+    final token = data['token'] as String?;
     return (token == null || token.isEmpty) ? null : token; // 把空字符串的情况也处理成null
   }
 }
