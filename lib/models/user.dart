@@ -63,6 +63,49 @@ class UserApi {
     final token = data['token'] as String?;
     return (token == null || token.isEmpty) ? null : token; // 把空字符串的情况也处理成null
   }
+
+  // 发送验证码
+  static Future<bool> sendCode({
+    required String target,
+    required String type,
+  }) async {
+    bool data = await dio
+        .post('/api/sendCode', data: {'target': target, 'type': type})
+        .then((res) => res.data);
+    return data;
+  }
+
+  // 验证验证码（独立验证，用于找回密码场景）
+  static Future<bool> verifyCode({
+    required String target,
+    required String code,
+  }) async {
+    bool data = await dio
+        .post('/api/verifyCode', data: {'target': target, 'code': code})
+        .then((res) => res.data);
+    return data;
+  }
+
+  // 注册（后端在 register 接口内部会再验一次 code）
+  static Future<bool> register({
+    required String username,
+    required String password,
+    required String target,
+    required String code,
+  }) async {
+    final data = await dio
+        .post(
+          '/api/register',
+          data: {
+            'username': username,
+            'password': password,
+            'target': target,
+            'code': code,
+          },
+        )
+        .then((res) => res.data);
+    return data is Map; // 注册成功返回 {id, username}
+  }
 }
 
 // 账号级全局配置状态模型
