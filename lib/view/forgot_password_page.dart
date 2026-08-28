@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chat_app/components/animated_background.dart';
 import 'package:chat_app/components/common_api.dart';
+import 'package:chat_app/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,7 +44,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   // 验证码倒计时
   int _countdownSeconds = 0;
   Timer? _timer;
-  void _startCountdown() {
+  void _startCountdown() async {
     final input = _accountController.text.trim();
     final accountType = checkAccountType(input);
     if (accountType == AccountType.invalid) {
@@ -52,6 +53,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       ).showSnackBar(const SnackBar(content: Text('请输入正确的邮箱或手机号格式')));
       return;
     }
+    final success = await UserApi.sendCode(
+      target: input,
+      type: accountType == AccountType.phone ? 'sms' : 'email',
+    );
+    if (!success) return; // 失败由 dio 拦截器弹窗处理
     // 开启倒计时
     setState(() {
       _countdownSeconds = 60;
