@@ -5,25 +5,53 @@ import 'package:chat_app/components/common_api.dart';
 // 单个用户/好友的数据模型
 class User {
   final String userId;
+  final String? username;
+  final String? email;
+  final String? phone;
   final bool? noDisturb;
   final bool? isTop;
 
-  const User({required this.userId, this.noDisturb, this.isTop});
-  // 通常带有 fromJson / toJson
+  const User({
+    required this.userId,
+    this.username,
+    this.email,
+    this.phone,
+    this.noDisturb,
+    this.isTop,
+  });
+
   factory User.fromJson(JsonMap json) {
     return User(
-      userId: json['userId'] as String, // 因为是dynamic 这里加as是保证类型安全
-      noDisturb: json['noDisturb'] == true, // 有些接口可能返回1/0或者null 这里做兼容处理
-      isTop: json['isTop'] == true,
+      userId: json['userId'].toString(),
+      username: json['username'] as String?,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      noDisturb: json['noDisturb'] as bool?,
+      isTop: json['isTop'] as bool?,
     );
   }
+
   JsonMap toJson() => {
-    'userId': userId, // dart中因为不存在全局变量 因此在不产生命名冲突时 可以省略this
+    'userId': userId,
+    'username': username,
+    'email': email,
+    'phone': phone,
     'noDisturb': noDisturb,
     'isTop': isTop,
   };
-  User copyWith({String? userId, bool? noDisturb, bool? isTop}) => User(
-    userId: userId ?? this.userId, // 这里跟局部变量有命名冲突 所以加this
+
+  User copyWith({
+    String? userId,
+    String? username,
+    String? email,
+    String? phone,
+    bool? noDisturb,
+    bool? isTop,
+  }) => User(
+    userId: userId ?? this.userId,
+    username: username ?? this.username,
+    email: email ?? this.email,
+    phone: phone ?? this.phone,
     noDisturb: noDisturb ?? this.noDisturb,
     isTop: isTop ?? this.isTop,
   );

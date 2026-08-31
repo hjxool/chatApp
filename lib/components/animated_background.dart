@@ -42,14 +42,21 @@ class _AnimatedBackgroundState extends State<AnimatedBackground>
               colors: [
                 Colors.blue.withValues(
                   alpha:
-                      0.5 +
-                      0.5 * math.sin(_backgroundController.value * 2 * math.pi),
+                      (0.5 +
+                              0.5 *
+                                  math.sin(
+                                    _backgroundController.value * 2 * math.pi,
+                                  ))
+                          .clamp(0.0, 1.0),
                 ),
                 Colors.purple.withValues(
                   alpha:
-                      0.05 +
-                      0.05 *
-                          math.cos(_backgroundController.value * 2 * math.pi),
+                      (0.05 +
+                              0.05 *
+                                  math.cos(
+                                    _backgroundController.value * 2 * math.pi,
+                                  ))
+                          .clamp(0.0, 1.0),
                 ),
                 Colors.white,
               ],

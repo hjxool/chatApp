@@ -25,13 +25,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 屏幕旋转时会自动重新build
-    ScreenSize.init(context);
-
     return MaterialApp(
       // MaterialApp 内部会创建一个 Navigator 如果不绑定 navigatorKey，只能在 widget 内部通过 Navigator.of(context) 找到它
       // 绑定后 就能在全局通过 navigatorKey.currentState 操作路由，不依赖 context
       navigatorKey: navigatorKey,
+      // 动态内容构建用builder
+      builder: (context, child) {
+        // init内调用了MediaQuery.of(context) 而 MediaQuery 是由 MaterialApp 创建的
+        // 所以不应该在 MaterialApp 外部调用
+        ScreenSize.init(context); // 屏幕旋转时会自动重新build
+        return child!;
+      },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

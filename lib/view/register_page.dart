@@ -158,7 +158,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             TextFormField(
                               controller: _nicknameController,
                               decoration: InputDecoration(
-                                labelText: '昵称',
+                                labelText: '用户名',
                                 prefixIcon: const Icon(Icons.person_outline),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.rpx),

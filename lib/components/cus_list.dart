@@ -30,13 +30,18 @@ class _CusListState extends State<CusList> {
   final List<ItemType> _items = []; // 用于展示动画的拷贝列表
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     _initList();
-    // 为了使用?.空安全 所以显式调用call 本质上fn.call()和fn()是一样的 但前者可以在fn为null时不调用而不报错
-    widget.onReady?.call(
-      OnReadyCallback(addFn: _addItems, removeFn: _removeItem),
-    );
+    // 在第一帧渲染完成后回调 onReady
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        // 为了使用?.空安全 所以显式调用call 本质上fn.call()和fn()是一样的 但前者可以在fn为null时不调用而不报错
+        widget.onReady?.call(
+          OnReadyCallback(addFn: _addItems, removeFn: _removeItem),
+        );
+      }
+    });
   }
 
   // 初始化列表
@@ -44,6 +49,7 @@ class _CusListState extends State<CusList> {
     for (int i = 0; i < widget.listData.length; i++) {
       // 添加暂停 使得每一项错落插入
       await Future.delayed(const Duration(milliseconds: 200));
+      if (!mounted) return; // 页面销毁时中断异步任务，防止内存泄漏或操作已销毁组件
       _addItems(widget.listData[i]);
     }
   }

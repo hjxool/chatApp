@@ -4,11 +4,15 @@ import 'package:intl/intl.dart';
 
 // 使用context版本
 class ScreenSize {
-  static late double width;
-  static late double height;
-  static late double scaleWidth;
+  static double width = 375;
+  static double height = 812;
+  static double scaleWidth = 375 / 750; // 默认缩放比 0.5，防止 ThemeData 等在 init 执行前访问 .rpx 抛出 LateInitializationError
+
   static void init(BuildContext context, {double designWidth = 750}) {
-    final size = MediaQuery.of(context).size;
+    final mediaQuery = MediaQuery.maybeOf(context);
+    if (mediaQuery == null) return;
+    final size = mediaQuery.size;
+    if (size.width == 0) return;
     width = (size.width * 100).round() / 100;
     height = (size.height * 100).round() / 100;
     scaleWidth = (width / designWidth * 100).round() / 100;
